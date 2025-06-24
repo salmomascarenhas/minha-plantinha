@@ -1,0 +1,30 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+
+
+# Arquivos de Build
+# A pasta dist contém o código JavaScript compilado, que é gerado a partir do código-fonte .ts
+dist/
+
+# Logs
+# Arquivos de log gerados durante a execução ou depuração
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Arquivos do Sistema Operacional
+.DS_Store
+Thumbs.db
