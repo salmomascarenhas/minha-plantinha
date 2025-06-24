@@ -1,5 +1,6 @@
 import express from 'express';
 import { setupSwagger } from './config/swagger';
+import { errorMiddleware } from './errors/errorMiddleware';
 import authRoutes from './routes/authRoutes';
 
 const app = express();
@@ -10,6 +11,8 @@ app.use(express.json());
 setupSwagger(app);
 
 app.use('/auth', authRoutes);
+
+app.use(errorMiddleware);
 
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
