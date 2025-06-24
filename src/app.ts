@@ -3,6 +3,7 @@ import express from 'express';
 import { setupSwagger } from './config/swagger';
 import { errorMiddleware } from './errors/errorMiddleware';
 import authRoutes from './routes/authRoutes';
+import deviceRoutes from './routes/deviceRoutes';
 import plantRoutes from './routes/plantRoutes';
 
 const app = express();
@@ -14,6 +15,7 @@ setupSwagger(app);
 
 app.use('/auth', authRoutes);
 app.use('/plants', plantRoutes);
+app.use('/device', deviceRoutes);
 
 app.use(errorMiddleware);
 
