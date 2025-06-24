@@ -11,7 +11,7 @@ const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '..', 'views'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use(express.json());
@@ -25,6 +25,7 @@ setupSwagger(app);
 app.use(errorMiddleware);
 
 app.listen(port, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${port}`);
+  console.log(`🚀 Servidor (backend) rodando em http://localhost:${port}/api`);
   console.log(`📚 Documentação da API disponível em http://localhost:${port}/api-docs`);
+  console.log(`🌱 Servidor (frontend) rodando em http://localhost:${port}`);
 });
