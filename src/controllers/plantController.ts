@@ -1,7 +1,11 @@
+import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
-import { UnauthorizedError } from '../errors/httpErrors';
+import { NotFoundError, UnauthorizedError } from '../errors/httpErrors';
+import * as dataService from '../services/dataService';
 import * as plantService from '../services/plantService';
+
+const prisma = new PrismaClient();
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw new UnauthorizedError('Ação permitida apenas para usuários autenticados.');
@@ -9,7 +13,37 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   const plantData = req.body;
   const userId = req.user.id;
 
-  const newPlant = await plantService.createPlant(plantData, userId);
+  const { plant, apiKey } = await plantService.createPlant(plantData, userId);
 
-  res.status(201).json(newPlant);
+  res.status(201).json({ plant, apiKey });
+});
+
+export const issueCommand = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw new UnauthorizedError('Ação permitida apenas para usuários autenticados.');
+
+  const { plantId } = req.params;
+  const command = req.body;
+
+  const plant = await prisma.plant.findFirst({ where: { id: plantId, userId: req.user.id } });
+  if (!plant) throw new NotFoundError('Planta não encontrada ou não pertence a este usuário.');
+
+  await plantService.setPendingCommand(plantId, command);
+  res.status(200).json({ message: 'Comando enviado para a fila do dispositivo.' });
+});
+
+export const getPlantHistory = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw new UnauthorizedError('Ação permitida apenas para usuários autenticados.');
+
+  const { plantId } = req.params;
+  const { period } = req.query as { period: '7d' | '30d' | 'all' };
+
+  const plant = await prisma.plant.findFirst({
+    where: { id: plantId, userId: req.user.id },
+  });
+
+  if (!plant) throw new NotFoundError('Planta não encontrada ou não pertence a este usuário.');
+
+  const historyData = await dataService.getHistoryForPlant(plantId, period);
+
+  res.status(200).json(historyData);
 });

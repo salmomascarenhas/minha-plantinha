@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as plantController from '../controllers/plantController';
 import { authMiddleware } from '../middlewares/authMiddleware';
-import { plantSchema, validate } from '../middlewares/validators';
+import { historyQuerySchema, plantSchema, validate } from '../middlewares/validators';
 
 const router = Router();
 
@@ -39,5 +39,92 @@ const router = Router();
  *         description: Conflito (dispositivo já em uso)
  */
 router.post('/', authMiddleware, validate(plantSchema), plantController.create);
+
+/**
+ * @swagger
+ * /plants/{plantId}/command:
+ *   post:
+ *     summary: Envia um comando para a planta do usuário autenticado
+ *     tags: [Plantas]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: plantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID da planta
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             description: Comando a ser enviado para o dispositivo da planta
+ *     responses:
+ *       200:
+ *         description: Comando enviado para a fila do dispositivo
+ *       401:
+ *         description: Não autorizado (token inválido ou não fornecido)
+ *       404:
+ *         description: Planta não encontrada ou não pertence a este usuário
+ */
+router.post('/:plantId/command', authMiddleware, plantController.issueCommand);
+
+/**
+ * @swagger
+ * /plants/{plantId}/history:
+ *   get:
+ *     summary: Retorna o histórico de dados dos sensores para uma planta específica
+ *     tags: [Plantas]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: plantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: O ID da planta
+ *       - in: query
+ *         name: period
+ *         schema:
+ *           type: string
+ *           enum: [7d, 30d, all]
+ *           default: 7d
+ *         description: O período para o qual buscar o histórico (7 dias, 30 dias, ou todos).
+ *     responses:
+ *       200:
+ *         description: Histórico de dados retornado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   temperature:
+ *                     type: number
+ *                   humidity:
+ *                     type: number
+ *                   luminosity:
+ *                     type: number
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *       401:
+ *         description: Não autorizado
+ *       404:
+ *         description: Planta não encontrada ou não pertence ao usuário
+ */
+router.get(
+  '/:plantId/history',
+  authMiddleware,
+  validate(historyQuerySchema),
+  plantController.getPlantHistory,
+);
 
 export default router;

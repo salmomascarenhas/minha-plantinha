@@ -41,12 +41,7 @@ export const validate =
       });
       next();
     } catch (error) {
-      if (error instanceof ZodError) {
-        const errorMessages = error.errors.map((issue) => ({
-          message: `${issue.path.join('.')} - ${issue.message}`,
-        }));
-        next(new BadRequestError('Erro de validação.', errorMessages));
-      }
+      if (error instanceof ZodError) next(error);
       next(new BadRequestError('Erro de validação.'));
     }
   };
@@ -58,5 +53,19 @@ export const plantSchema = z.object({
       .min(2, 'O nome deve ter no mínimo 2 caracteres.'),
     species: z.string({ required_error: 'A espécie é obrigatória.' }),
     deviceId: z.string({ required_error: 'O ID do dispositivo é obrigatório.' }),
+  }),
+});
+
+export const sensorDataSchema = z.object({
+  body: z.object({
+    temperature: z.number({ required_error: 'A temperatura é obrigatória.' }),
+    humidity: z.number({ required_error: 'A umidade é obrigatória.' }),
+    luminosity: z.number({ required_error: 'A luminosidade é obrigatória.' }),
+  }),
+});
+
+export const historyQuerySchema = z.object({
+  query: z.object({
+    period: z.enum(['7d', '30d', 'all']).optional().default('7d'),
   }),
 });

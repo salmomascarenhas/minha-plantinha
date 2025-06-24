@@ -22,6 +22,7 @@
   "homepage": "https://github.com/salmomascarenhas/minha-plantinha#readme",
   "dependencies": {
     "@prisma/client": "^6.10.1",
+    "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
