@@ -76,6 +76,9 @@
                 });
 
                 const data = await response.json();
+
+
+                if (!response.ok) 
                     throw new Error(data.message || 'Erro ao tentar fazer login.');
                 
                 localStorage.setItem('authToken', data.token);
