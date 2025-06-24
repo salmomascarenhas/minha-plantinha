@@ -63,3 +63,9 @@ export const sensorDataSchema = z.object({
     luminosity: z.number({ required_error: 'A luminosidade é obrigatória.' }),
   }),
 });
+
+export const historyQuerySchema = z.object({
+  query: z.object({
+    period: z.enum(['7d', '30d', 'all']).optional().default('7d'),
+  }),
+});
