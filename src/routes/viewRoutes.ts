@@ -13,4 +13,8 @@ router.get('/register', (req, res) => {
   res.render('register', { title: 'Crie sua Conta' });
 });
 
+router.get('/dashboard', (req, res) => {
+  res.render('dashboard', { title: 'Dashboard', user: { name: 'Carregando...' } });
+});
+
 export default router;

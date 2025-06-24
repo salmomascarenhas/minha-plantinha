@@ -47,3 +47,24 @@ export const getPlantHistory = asyncHandler(async (req: Request, res: Response) 
 
   res.status(200).json(historyData);
 });
+
+export const getMyPlantData = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw new UnauthorizedError('Usuário não autenticado.');
+
+  const plant = await prisma.plant.findFirst({
+    where: { userId: req.user.id },
+    include: {
+      SensorData: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 1,
+      },
+    },
+  });
+
+  if (!plant)
+    throw new NotFoundError('Nenhuma planta encontrada para este usuário. Cadastre uma primeiro.');
+
+  res.status(200).json({ plant, user: req.user });
+});

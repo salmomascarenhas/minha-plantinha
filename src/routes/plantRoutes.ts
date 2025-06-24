@@ -7,6 +7,69 @@ const router = Router();
 
 /**
  * @swagger
+ * /plants/my-plant:
+ *   get:
+ *     summary: Retorna os dados da planta principal do usuário e a última leitura dos sensores
+ *     tags: [Plantas]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dados da planta e dos sensores retornados com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 species:
+ *                   type: string
+ *                 deviceId:
+ *                   type: string
+ *                 apiKey:
+ *                   type: string
+ *                 pendingCommand:
+ *                   type: object
+ *                   nullable: true
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                 userId:
+ *                   type: string
+ *                 SensorData:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       temperature:
+ *                         type: number
+ *                         format: float
+ *                       humidity:
+ *                         type: number
+ *                         format: float
+ *                       luminosity:
+ *                         type: number
+ *                         format: float
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *       401:
+ *         description: Não autorizado
+ *       404:
+ *         description: Nenhuma planta encontrada para o usuário
+ */
+router.get('/my-plant', authMiddleware, plantController.getMyPlantData);
+
+/**
+ * @swagger
  * /plants:
  *   post:
  *     summary: Cadastra uma nova planta para o usuário autenticado
