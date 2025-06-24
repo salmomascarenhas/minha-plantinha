@@ -12,11 +12,11 @@ export const errorMiddleware = (err: Error, req: Request, res: Response, next: N
       if (!errorMap[path]) errorMap[path] = [];
       errorMap[path].push(issue.message);
     });
-    res.status(400).json({ message: 'Erro de validação.', details: errorMap });
+    return res.status(400).json({ message: 'Erro de validação.', details: errorMap });
   }
 
   if (err instanceof HttpError)
-    res.status(err.statusCode).json({ message: err.message, details: err.errorMessages });
+    return res.status(err.statusCode).json({ message: err.message, details: err.errorMessages });
 
-  res.status(500).json({ message: 'Erro interno do servidor.' });
+  return res.status(500).json({ message: 'Erro interno do servidor.' });
 };
