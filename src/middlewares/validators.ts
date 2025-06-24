@@ -41,12 +41,7 @@ export const validate =
       });
       next();
     } catch (error) {
-      if (error instanceof ZodError) {
-        const errorMessages = error.errors.map((issue) => ({
-          message: `${issue.path.join('.')} - ${issue.message}`,
-        }));
-        next(new BadRequestError('Erro de validação.', errorMessages));
-      }
+      if (error instanceof ZodError) next(error);
       next(new BadRequestError('Erro de validação.'));
     }
   };
