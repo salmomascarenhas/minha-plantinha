@@ -50,3 +50,13 @@ export const validate =
       next(new BadRequestError('Erro de validação.'));
     }
   };
+
+export const plantSchema = z.object({
+  body: z.object({
+    name: z
+      .string({ required_error: 'O nome da planta é obrigatório.' })
+      .min(2, 'O nome deve ter no mínimo 2 caracteres.'),
+    species: z.string({ required_error: 'A espécie é obrigatória.' }),
+    deviceId: z.string({ required_error: 'O ID do dispositivo é obrigatório.' }),
+  }),
+});
