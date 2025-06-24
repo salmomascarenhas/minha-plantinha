@@ -60,3 +60,11 @@ export const plantSchema = z.object({
     deviceId: z.string({ required_error: 'O ID do dispositivo é obrigatório.' }),
   }),
 });
+
+export const sensorDataSchema = z.object({
+  body: z.object({
+    temperature: z.number({ required_error: 'A temperatura é obrigatória.' }),
+    humidity: z.number({ required_error: 'A umidade é obrigatória.' }),
+    luminosity: z.number({ required_error: 'A luminosidade é obrigatória.' }),
+  }),
+});
