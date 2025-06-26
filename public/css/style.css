@@ -30,6 +30,7 @@
     --color-slate-900: oklch(20.8% 0.042 265.755);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-900: oklch(21% 0.034 264.665);
+    --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-md: 28rem;
@@ -219,8 +220,14 @@
   .absolute {
     position: absolute;
   }
+  .fixed {
+    position: fixed;
+  }
   .relative {
     position: relative;
+  }
+  .inset-0 {
+    inset: calc(var(--spacing) * 0);
   }
   .inset-x-0 {
     inset-inline: calc(var(--spacing) * 0);
@@ -419,6 +426,9 @@
   }
   .border-transparent {
     border-color: transparent;
+  }
+  .bg-black {
+    background-color: var(--color-black);
   }
   .bg-blue-600 {
     background-color: var(--color-blue-600);
@@ -862,6 +872,9 @@
       text-align: center;
     }
   }
+}
+#splash {
+  transition: opacity 0.5s ease-out;
 }
 @property --tw-space-y-reverse {
   syntax: "*";
