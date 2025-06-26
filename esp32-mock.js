@@ -5,7 +5,7 @@ const API_KEY = 'COLE_AQUI_SUA_API_KEY';
 // --- CONFIGURAÇÃO ---
 const CONFIG = {
   API_KEY: API_KEY, 
-  BASE_URL: 'http://localhost:3000',
+  BASE_URL: 'http://localhost:3000/api', 
   // Intervalo em milissegundos para enviar dados e verificar comandos
   INTERVAL: 10000, // 10 segundos
 };
@@ -29,7 +29,7 @@ function generateFakeSensorData() {
  * Envia os dados dos sensores para a API.
  */
 async function sendSensorData() {
-  if (CONFIG.API_KEY === API_KEY) return; 
+  if (CONFIG.API_KEY !== API_KEY) return; 
 
   try {
     const data = generateFakeSensorData();
@@ -49,7 +49,7 @@ async function sendSensorData() {
  * Busca por comandos pendentes na API.
  */
 async function fetchCommands() {
-  if (CONFIG.API_KEY === API_KEY) return; 
+  if (CONFIG.API_KEY !== API_KEY) return; 
   
   try {
     const response = await axios.get(`${CONFIG.BASE_URL}/device/commands`, {
@@ -72,7 +72,7 @@ async function fetchCommands() {
 
 function main() {
   console.log('--- Mock do Dispositivo ESP32 Iniciado ---');
-  if (CONFIG.API_KEY === API_KEY) {
+  if (CONFIG.API_KEY !== API_KEY) {
     console.warn('AVISO: A API Key não foi configurada. O script não fará nada.');
     console.warn('Por favor, edite o arquivo esp32-mock.js com a chave gerada ao cadastrar uma planta.');
     return;
