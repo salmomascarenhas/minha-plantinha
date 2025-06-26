@@ -1,175 +1,206 @@
-<div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-    <header class="mb-8">
-        <h1 id="plant-name" class="h-9 w-3/4 rounded-md bg-slate-200 animate-pulse"></h1>
-    </header>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
 
-    <div id="dashboard-content" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <div class="lg:col-span-1 space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                <h3 class="text-lg font-semibold text-slate-800">💧 Umidade do Solo</h3>
-                <p id="humidity-value" class="text-4xl font-bold text-blue-600 mt-2 h-12 w-1/2 rounded-md bg-slate-200 animate-pulse"></p>
-                <p id="humidity-status" class="text-sm mt-1 h-5 w-3/4 rounded-md bg-slate-200 animate-pulse"></p>
+    <div class="mx-auto max-w-7xl py-10 px-4 sm:px-6 lg:px-8">
+        <!-- Cabeçalho -->
+        <header class="mb-10 text-center">
+            <h1 id="plant-name"
+                class="inline-flex items-center justify-center text-3xl font-bold text-green-800 bg-green-100 rounded-full px-6 py-3 shadow-sm animate-pulse">
+                🌱 Carregando sua plantinha...
+            </h1>
+        </header>
+
+        <!-- Conteúdo principal -->
+        <div id="dashboard-content" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Coluna de Leituras -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Umidade do Solo -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-green-200">
+                    <h3 class="text-lg font-semibold text-green-800 flex items-center gap-2">💧 Umidade do Solo</h3>
+                    <p id="humidity-value"
+                        class="text-4xl font-bold text-blue-600 mt-2 h-12 w-1/2 rounded-md bg-blue-100 animate-pulse">
+                    </p>
+                    <p id="humidity-status" class="text-sm mt-1 h-5 w-3/4 rounded-md bg-blue-50 animate-pulse"></p>
+                </div>
+
+                <!-- Temperatura -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-orange-200">
+                    <h3 class="text-lg font-semibold text-orange-700 flex items-center gap-2">🌡️ Temperatura</h3>
+                    <p id="temperature-value"
+                        class="text-4xl font-bold text-orange-500 mt-2 h-12 w-1/2 rounded-md bg-orange-100 animate-pulse">
+                    </p>
+                </div>
+
+                <!-- Luminosidade -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-yellow-200">
+                    <h3 class="text-lg font-semibold text-yellow-700 flex items-center gap-2">☀️ Luminosidade</h3>
+                    <p id="luminosity-value"
+                        class="text-4xl font-bold text-yellow-500 mt-2 h-12 w-1/2 rounded-md bg-yellow-100 animate-pulse">
+                    </p>
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                <h3 class="text-lg font-semibold text-slate-800">🌡️ Temperatura</h3>
-                <p id="temperature-value" class="text-4xl font-bold text-orange-500 mt-2 h-12 w-1/2 rounded-md bg-slate-200 animate-pulse"></p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                <h3 class="text-lg font-semibold text-slate-800">☀️ Luminosidade</h3>
-                <p id="luminosity-value" class="text-4xl font-bold text-amber-500 mt-2 h-12 w-1/2 rounded-md bg-slate-200 animate-pulse"></p>
+
+            <!-- Coluna de Mascote e Controles -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Mascote -->
+                <div
+                    class="bg-white p-4 rounded-xl shadow-md border border-green-100 aspect-video flex items-center justify-center">
+                    <div id="rive-canvas-container" class="w-full h-full flex items-center justify-center">
+                        <p class="text-slate-400 italic">Animação do Mascote "Caquito" aqui...</p>
+                    </div>
+                </div>
+
+                <!-- Controles Manuais -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-green-200">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4">⚙️ Controles Manuais</h3>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <button id="water-button"
+                            class="flex-1 bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            disabled>
+                            💦 Regar Agora
+                        </button>
+                        <button id="cover-button"
+                            class="flex-1 bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50"
+                            disabled>
+                            ⛱️ Acionar Lona
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white p-4 rounded-xl shadow-md border border-slate-200 aspect-video flex items-center justify-center">
-                <div id="rive-canvas-container" class="w-full h-full flex items-center justify-center">
-                    <p class="text-slate-400">Animação do Mascote "Caquito" aqui...</p>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
-                <h3 class="text-lg font-semibold text-slate-800">Controles Manuais</h3>
-                <div class="mt-4 flex space-x-4">
-                    <button id="water-button" class="flex-1 bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50" disabled>
-                        Regar Agora
-                    </button>
-                    <button id="cover-button" class="flex-1 bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50" disabled>
-                        Acionar Lona
-                    </button>
-                </div>
-            </div>
+        <!-- Tela de Planta Não Encontrada -->
+        <div id="no-plant-view"
+            class="hidden mt-12 text-center p-8 bg-white shadow-lg rounded-xl border border-slate-200">
+            <span class="text-5xl">🤔</span>
+            <h2 class="mt-4 text-2xl font-bold text-slate-800">Nenhuma planta encontrada!</h2>
+            <p class="mt-2 text-slate-600">Parece que você ainda não cadastrou uma plantinha para monitorar.</p>
+            <button id="add-plant-button"
+                class="mt-6 bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
+                🌿 Cadastrar minha primeira planta
+            </button>
         </div>
-
     </div>
-    
-    <div id="no-plant-view" class="hidden text-center p-8 bg-white shadow-lg rounded-xl border border-slate-200">
-        <span class="text-5xl">🤔</span>
-        <h2 class="mt-4 text-2xl font-bold text-slate-800">Nenhuma planta encontrada!</h2>
-        <p class="mt-2 text-slate-600">Parece que você ainda não cadastrou uma planta para monitorar.</p>
-        <button id="add-plant-button" class="mt-6 bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">
-            Cadastrar minha primeira planta
-        </button>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) {
-            window.location.href = '/login';
-            return;
-        }
-
-        const elements = {
-            plantName: document.getElementById('plant-name'),
-            humidityValue: document.getElementById('humidity-value'),
-            humidityStatus: document.getElementById('humidity-status'),
-            temperatureValue: document.getElementById('temperature-value'),
-            luminosityValue: document.getElementById('luminosity-value'),
-            
-            headerUser: document.getElementById('header-user-name'), 
-            
-            logoutButton: document.getElementById('logout-button'),
-            dashboardContent: document.getElementById('dashboard-content'),
-            noPlantView: document.getElementById('no-plant-view'),
-            addPlantButton: document.getElementById('add-plant-button'),
-            waterButton: document.getElementById('water-button'),
-            coverButton: document.getElementById('cover-button'),
-        };
 
 
-        const updateDashboardUI = (data) => {
-            const { plant, user } = data;
-
-            elements.plantName.textContent = plant.name;
-            elements.plantName.classList.remove('h-9', 'w-3/4', 'bg-slate-200', 'animate-pulse');
-            
-            elements.headerUser.textContent = `Olá, ${user.name}`;
-
-            const latestReading = plant.sensorData[0];
-            if (latestReading) {
-                elements.humidityValue.textContent = `${latestReading.humidity.toFixed(1)} %`;
-                elements.temperatureValue.textContent = `${latestReading.temperature.toFixed(1)} °C`;
-                elements.luminosityValue.textContent = `${latestReading.luminosity.toFixed(0)} lux`;
-
-                [elements.humidityValue, elements.temperatureValue, elements.luminosityValue, elements.humidityStatus].forEach(el => {
-                    el.classList.remove('h-12', 'w-1/2', 'h-5', 'w-3/4', 'bg-slate-200', 'animate-pulse');
-                });
-                
-                if (latestReading.humidity > 70) {
-                    elements.humidityStatus.textContent = 'Solo muito úmido.';
-                    elements.humidityStatus.className = 'text-sm text-blue-500 mt-1';
-                } else if (latestReading.humidity > 40) {
-                    elements.humidityStatus.textContent = 'Planta bem hidratada.';
-                    elements.humidityStatus.className = 'text-sm text-green-500 mt-1';
-                } else {
-                    elements.humidityStatus.textContent = 'Necessita de rega.';
-                    elements.humidityStatus.className = 'text-sm text-amber-600 mt-1';
-                }
-            } else {
-                [elements.humidityValue, elements.temperatureValue, elements.luminosityValue].forEach(el => {
-                     el.textContent = '--';
-                     el.classList.remove('h-12', 'w-1/2', 'bg-slate-200', 'animate-pulse');
-                });
-                elements.humidityStatus.textContent = 'Nenhuma leitura de sensor recebida ainda.';
-                elements.humidityStatus.classList.remove('h-5', 'w-3/4', 'bg-slate-200', 'animate-pulse');
-            }
-
-            elements.waterButton.disabled = false;
-            elements.coverButton.disabled = false;
-        };
-
-        const showNoPlantState = () => {
-            elements.dashboardContent.classList.add('hidden');
-            elements.noPlantView.classList.remove('hidden');
-            if (elements.addPlantButton) {
-                elements.addPlantButton.addEventListener('click', () => {
-                    // Futuramente, redirecionar para a página de cadastro de planta
-                    alert('Redirecionando para o cadastro de planta...');
-                });
-            }
-            try {
-                const tempUser = JSON.parse(atob(authToken.split('.')[1]));
-                elements.headerUser.textContent = `Olá, ${tempUser.name || 'Usuário'}`;
-            } catch (e) {
-                console.error("Erro ao decodificar token para o nome do usuário", e);
-            }
-        };
-
-        const fetchDashboardData = async () => {
-            try {
-                const response = await fetch('/api/plants/my-plant', {
-                    headers: { 'Authorization': `Bearer ${authToken}` },
-                });
-
-                if (response.status === 404) {
-                    showNoPlantState();
-                    return;
-                }
-                
-                if (response.status === 401 || response.status === 403) {
-                    throw new Error('Sessão inválida ou expirada.');
-                }
-
-                if (!response.ok) {
-                    throw new Error('Não foi possível carregar os dados do dashboard.');
-                }
-                
-                const data = await response.json();
-                updateDashboardUI(data);
-
-            } catch (error) {
-                localStorage.removeItem('authToken');
-                alert(error.message);
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authToken = localStorage.getItem('authToken');
+            if (!authToken) {
                 window.location.href = '/login';
+                return;
             }
-        };
 
-        elements.logoutButton.addEventListener('click', () => {
-            localStorage.removeItem('authToken');
-            window.location.href = '/login';
+            const elements = {
+                plantName: document.getElementById('plant-name'),
+                humidityValue: document.getElementById('humidity-value'),
+                humidityStatus: document.getElementById('humidity-status'),
+                temperatureValue: document.getElementById('temperature-value'),
+                luminosityValue: document.getElementById('luminosity-value'),
+
+                headerUser: document.getElementById('header-user-name'),
+
+                logoutButton: document.getElementById('logout-button'),
+                dashboardContent: document.getElementById('dashboard-content'),
+                noPlantView: document.getElementById('no-plant-view'),
+                addPlantButton: document.getElementById('add-plant-button'),
+                waterButton: document.getElementById('water-button'),
+                coverButton: document.getElementById('cover-button'),
+            };
+
+
+            const updateDashboardUI = (data) => {
+                const { plant, user } = data;
+
+                elements.plantName.textContent = plant.name;
+                elements.plantName.classList.remove('h-9', 'w-3/4', 'bg-slate-200', 'animate-pulse');
+
+                elements.headerUser.textContent = `Olá, ${user.name}`;
+
+                const latestReading = plant.sensorData[0];
+                if (latestReading) {
+                    elements.humidityValue.textContent = `${latestReading.humidity.toFixed(1)} %`;
+                    elements.temperatureValue.textContent = `${latestReading.temperature.toFixed(1)} °C`;
+                    elements.luminosityValue.textContent = `${latestReading.luminosity.toFixed(0)} lux`;
+
+                    [elements.humidityValue, elements.temperatureValue, elements.luminosityValue, elements.humidityStatus].forEach(el => {
+                        el.classList.remove('h-12', 'w-1/2', 'h-5', 'w-3/4', 'bg-slate-200', 'animate-pulse');
+                    });
+
+                    if (latestReading.humidity > 70) {
+                        elements.humidityStatus.textContent = 'Solo muito úmido.';
+                        elements.humidityStatus.className = 'text-sm text-blue-500 mt-1';
+                    } else if (latestReading.humidity > 40) {
+                        elements.humidityStatus.textContent = 'Planta bem hidratada.';
+                        elements.humidityStatus.className = 'text-sm text-green-500 mt-1';
+                    } else {
+                        elements.humidityStatus.textContent = 'Necessita de rega.';
+                        elements.humidityStatus.className = 'text-sm text-amber-600 mt-1';
+                    }
+                } else {
+                    [elements.humidityValue, elements.temperatureValue, elements.luminosityValue].forEach(el => {
+                        el.textContent = '--';
+                        el.classList.remove('h-12', 'w-1/2', 'bg-slate-200', 'animate-pulse');
+                    });
+                    elements.humidityStatus.textContent = 'Nenhuma leitura de sensor recebida ainda.';
+                    elements.humidityStatus.classList.remove('h-5', 'w-3/4', 'bg-slate-200', 'animate-pulse');
+                }
+
+                elements.waterButton.disabled = false;
+                elements.coverButton.disabled = false;
+            };
+
+            const showNoPlantState = () => {
+                elements.dashboardContent.classList.add('hidden');
+                elements.noPlantView.classList.remove('hidden');
+                if (elements.addPlantButton) {
+                    elements.addPlantButton.addEventListener('click', () => {
+                        // Futuramente, redirecionar para a página de cadastro de planta
+                        alert('Redirecionando para o cadastro de planta...');
+                    });
+                }
+                try {
+                    const tempUser = JSON.parse(atob(authToken.split('.')[1]));
+                    elements.headerUser.textContent = `Olá, ${tempUser.name || 'Usuário'}`;
+                } catch (e) {
+                    console.error("Erro ao decodificar token para o nome do usuário", e);
+                }
+            };
+
+            const fetchDashboardData = async () => {
+                try {
+                    const response = await fetch('/api/plants/my-plant', {
+                        headers: { 'Authorization': `Bearer ${authToken}` },
+                    });
+
+                    if (response.status === 404) {
+                        showNoPlantState();
+                        return;
+                    }
+
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('Sessão inválida ou expirada.');
+                    }
+
+                    if (!response.ok) {
+                        throw new Error('Não foi possível carregar os dados do dashboard.');
+                    }
+
+                    const data = await response.json();
+                    updateDashboardUI(data);
+
+                } catch (error) {
+                    localStorage.removeItem('authToken');
+                    alert(error.message);
+                    window.location.href = '/login';
+                }
+            };
+
+            elements.logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('authToken');
+                window.location.href = '/login';
+            });
+
+            fetchDashboardData();
         });
-
-        fetchDashboardData();
-    });
-</script>
+    </script>

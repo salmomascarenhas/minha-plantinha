@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'Minha Plantinha' %></title>
+    <title>
+        <%= title || 'Minha Plantinha' %>
+    </title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,17 +14,20 @@
 
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="bg-slate-100 font-sans">
-    
-    <% if (typeof user !== 'undefined' && user) { %>
-        <%- include('./partials/_header', { user: user }) %>
-    <% } %>
 
-    <main>
-        <%- body %>
-    </main>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
 
-    <%- include('./partials/_footer') %>
+
+    <% if (typeof user !=='undefined' && user) { %>
+        <%- include('partials/_header', { user: user }) %>
+            <% } %>
+
+                <main>
+                    <%- body %>
+                    <%- include('./partials/_footer') %>
+                </main>
+
 
 </body>
+
 </html>
