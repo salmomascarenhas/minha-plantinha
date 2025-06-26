@@ -9,13 +9,13 @@ const options: swaggerJSDoc.Options = {
       title: 'Minha Plantinha API',
       version: '1.0.0',
       description: 'Documentação da API para o projeto Minha Plantinha.',
-      components: {
-        securitySchemes: {
-          BearerAuth: {
-            type: 'http',
-            scheme: 'bearer',
-            bearerFormat: 'JWT',
-          },
+    },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
         },
       },
     },

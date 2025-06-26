@@ -11,23 +11,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/@rive-app/canvas"></script>
 </head>
-
-<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
-
-
-    <% if (typeof user !=='undefined' && user) { %>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen overflow-hidden"> 
+    
+    <% if (typeof user !== 'undefined' && user) { %>
         <%- include('partials/_header', { user: user }) %>
-            <% } %>
-
-                <main>
-                    <%- body %>
-                    <%- include('./partials/_footer') %>
-                </main>
-
-
+        <% } %>
+        
+    <div id="splash" class="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <canvas id="rive-canvas" 
+            style="
+                position: absolute;
+                height: 100%;
+                width: 100%;
+            "
+        ></canvas>
+    </div>
+    
+    <main id="site-content" class="hidden">
+        <%- body %>
+        <%- include('partials/_footer') %>
+    </main>
+    
+    <script type="module" src="/js/splash.js"></script>
 </body>
 
 </html>
