@@ -29,8 +29,6 @@ const router = Router();
  *                   type: string
  *                 deviceId:
  *                   type: string
- *                 apiKey:
- *                   type: string
  *                 pendingCommand:
  *                   type: object
  *                   nullable: true

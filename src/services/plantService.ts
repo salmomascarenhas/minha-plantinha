@@ -9,7 +9,7 @@ type PlantCreateData = Omit<Plant, 'id' | 'createdAt' | 'updatedAt' | 'userId'>;
 export const createPlant = async (
   data: PlantCreateData,
   userId: string,
-): Promise<{ plant: Plant; apiKey: string }> => {
+): Promise<{ plant: Omit<Plant, 'apiKey'>; apiKey: string }> => {
   const existingDevice = await prisma.plant.findUnique({
     where: { deviceId: data.deviceId },
   });
@@ -31,7 +31,9 @@ export const createPlant = async (
     },
   });
 
-  return { plant: newPlant, apiKey };
+  const { apiKey: plantApiKe, ...plantWithoutApiKey } = newPlant;
+
+  return { plant: plantWithoutApiKey, apiKey };
 };
 
 export const setPendingCommand = async (

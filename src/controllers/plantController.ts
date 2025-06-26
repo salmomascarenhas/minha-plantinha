@@ -66,5 +66,7 @@ export const getMyPlantData = asyncHandler(async (req: Request, res: Response) =
   if (!plant)
     throw new NotFoundError('Nenhuma planta encontrada para este usuário. Cadastre uma primeiro.');
 
-  res.status(200).json({ plant, user: req.user });
+  const { apiKey, ...plantWithoutApi } = plant;
+
+  res.status(200).json({ plant: plantWithoutApi, user: req.user });
 });
