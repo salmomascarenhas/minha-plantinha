@@ -13,6 +13,9 @@ router.get('/register', (req, res) => {
   res.render('register', { title: 'Crie sua Conta' });
 });
 
+router.get('/saibaMais', (req, res) => {
+  res.render('saibaMais', { title: 'Saiba mais' });
+});
 router.get('/dashboard', (req, res) => {
   res.render('dashboard', { title: 'Dashboard', user: { name: 'Carregando...' } });
 });
