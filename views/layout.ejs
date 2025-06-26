@@ -14,14 +14,14 @@
 <body class="bg-slate-100 font-sans">
     
     <% if (typeof user !== 'undefined' && user) { %>
-        <%- include('partials/_header', { user: user }) %>
+        <%- include('./partials/_header', { user: user }) %>
     <% } %>
 
     <main>
         <%- body %>
     </main>
 
-    <%- include('partials/_footer') %>
+    <%- include('./partials/_footer') %>
 
 </body>
 </html>
