@@ -10,6 +10,7 @@ const router = Router();
  *   post:
  *     summary: Registra um novo usuário
  *     tags: [Autenticação]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -45,6 +46,7 @@ router.post('/register', validate(registerSchema), userController.register);
  *   post:
  *     summary: Autentica um usuário e retorna um token JWT
  *     tags: [Autenticação]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
