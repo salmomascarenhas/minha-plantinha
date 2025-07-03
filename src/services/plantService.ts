@@ -1,5 +1,5 @@
 import { Plant, Prisma, PrismaClient } from '@prisma/client';
-import crypto from 'crypto'; // 1. Importar o módulo 'crypto'
+import crypto from 'crypto';
 import { ConflictError } from '../errors/httpErrors';
 
 const prisma = new PrismaClient();
