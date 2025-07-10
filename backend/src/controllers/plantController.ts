@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { NotFoundError, UnauthorizedError } from '../errors/httpErrors';
 import * as dataService from '../services/dataService';
+import * as gamificationService from '../services/gamificationService';
 import * as plantService from '../services/plantService';
 
 const prisma = new PrismaClient();
@@ -26,6 +27,10 @@ export const issueCommand = asyncHandler(async (req: Request, res: Response) => 
 
   const plant = await prisma.plant.findFirst({ where: { id: plantId, userId: req.user.id } });
   if (!plant) throw new NotFoundError('Planta não encontrada ou não pertence a este usuário.');
+
+  if (command.action === 'WATER_PUMP') {
+    await gamificationService.unlockAchievement(req.user.id, 'FIRST_WATER');
+  }
 
   await plantService.setPendingCommand(plantId, command);
   res.status(200).json({ message: 'Comando enviado para a fila do dispositivo.' });
