@@ -1,0 +1,25 @@
+.icon {
+  pointer-events: none;
+  position: absolute;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.light {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.dark {
+  opacity: 0;
+  transform: scale(0) rotate(90deg);
+}
+
+[data-mantine-color-scheme='dark'] .light {
+  opacity: 0;
+  transform: scale(0) rotate(-90deg);
+}
+
+[data-mantine-color-scheme='dark'] .dark {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
