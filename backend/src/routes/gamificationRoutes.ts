@@ -29,7 +29,7 @@ const router = Router();
  *       401:
  *         description: Não autorizado
  */
-router.route('/status').get(authMiddleware, gamificationController.getGamificationStatus);
+router.get('/status', authMiddleware, gamificationController.getGamificationStatus);
 
 export default router;
 
