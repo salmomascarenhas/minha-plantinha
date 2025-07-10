@@ -2,6 +2,7 @@ import { PrismaClient, User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { ConflictError, NotFoundError, UnauthorizedError } from '../errors/httpErrors';
+import * as gamificationService from './gamificationService';
 
 const prisma = new PrismaClient();
 
@@ -21,6 +22,8 @@ export const createUser = async (
       password: hashedPassword,
     },
   });
+
+  await gamificationService.unlockAchievement(newUser.id, 'FIRST_LOGIN');
 
   const { password, ...userWithoutPassword } = newUser;
   return userWithoutPassword;

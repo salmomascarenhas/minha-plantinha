@@ -1,23 +1,42 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  Alert,
   Anchor,
   Button,
-  Container,
+  Checkbox,
+  Divider,
+  Group,
   Paper,
   PasswordInput,
   Stack,
   Text,
   TextInput,
   Title,
-} from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { useMutation } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router';
-import { useAuth } from '../hooks/useAuth';
-import api from '../services/apiService';
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import {
+  IconAlertCircle,
+  IconBrandGithub,
+  IconBrandGoogle,
+  IconLock,
+  IconMail,
+} from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import { AuthLayout } from "../layouts/AuthLayout";
+import api from "../services/apiService";
 
 interface LoginResponse {
   token: string;
-  user: { id: string; name: string; email: string; createdAt: Date; updatedAt: Date };
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 }
 
 export function LoginPage() {
@@ -26,65 +45,128 @@ export function LoginPage() {
 
   const form = useForm({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
+      rememberMe: false,
     },
     validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email inválido'),
-      password: (value) => (value.length > 0 ? null : 'Senha é obrigatória'),
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Email inválido"),
+      password: (value) => (value.length > 0 ? null : "Senha é obrigatória"),
     },
   });
 
-  // Hook de mutação do React Query para a chamada de login
   const loginMutation = useMutation<LoginResponse, Error, typeof form.values>({
-    mutationFn: (credentials) => api.post('/auth/login', credentials).then((res) => res.data),
+    mutationFn: (credentials) =>
+      api.post("/auth/login", credentials).then((res) => res.data),
     onSuccess: (data) => {
       auth.login(data.token);
-      navigate('/dashboard');
+      notifications.show({
+        title: "Bem-vindo de volta!",
+        message: "Login realizado com sucesso.",
+        color: "green",
+      });
+      navigate("/dashboard");
     },
     onError: (error) => {
-      // Exibe o erro no formulário
       form.setErrors({ root: error.message });
     },
   });
 
   return (
-    <Container size={420} my={40}>
-      <Title ta="center">Bem-vindo de volta!</Title>
-      <Text c="dimmed" size="sm" ta="center" mt={5}>
-        Ainda não tem uma conta?{' '}
-        <Anchor size="sm" component={Link} to="/register">
-          Crie uma conta
-        </Anchor>
-      </Text>
+    <AuthLayout>
+      <Stack gap="lg">
+        <div>
+          <Title order={2} ta="center" mt="md">
+            Bem-vindo de volta!
+          </Title>
+          <Text c="dimmed" size="sm" ta="center" mt={5}>
+            Ainda não tem uma conta?{" "}
+            <Anchor size="sm" component={Link} to="/register">
+              Crie uma conta
+            </Anchor>
+          </Text>
+        </div>
 
-      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-        <form onSubmit={form.onSubmit((values) => loginMutation.mutate(values))}>
-          <Stack>
-            <TextInput
-              required
-              label="Email"
-              placeholder="voce@exemplo.com"
-              {...form.getInputProps('email')}
-            />
-            <PasswordInput
-              required
-              label="Senha"
-              placeholder="Sua senha"
-              {...form.getInputProps('password')}
-            />
-            {/* Exibe erro geral da mutação */}
-            {loginMutation.isError && (
-              <Text c="red" size="sm">
-                {form.errors.root}
-              </Text>
-            )}
-            <Button type="submit" loading={loginMutation.isPending} fullWidth mt="xl">
-              Entrar
-            </Button>
-          </Stack>
-        </form>
-      </Paper>
-    </Container>
+        <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+          <form
+            onSubmit={form.onSubmit((values) => loginMutation.mutate(values))}
+          >
+            <Stack gap="md">
+              <TextInput
+                required
+                size="md"
+                label="Email"
+                placeholder="voce@exemplo.com"
+                leftSection={<IconMail size={18} />}
+                {...form.getInputProps("email")}
+              />
+
+              <PasswordInput
+                required
+                size="md"
+                label="Senha"
+                placeholder="Sua senha"
+                leftSection={<IconLock size={18} />}
+                {...form.getInputProps("password")}
+              />
+
+              <Group justify="space-between" mt="xs">
+                <Checkbox
+                  label="Lembrar-me"
+                  size="sm"
+                  {...form.getInputProps("rememberMe", { type: "checkbox" })}
+                />
+                <Anchor component={Link} size="sm" to="/forgot-password">
+                  Esqueceu a senha?
+                </Anchor>
+              </Group>
+
+              {loginMutation.isError && (
+                <Alert
+                  color="red"
+                  variant="light"
+                  title="Erro ao fazer login"
+                  icon={<IconAlertCircle />}
+                >
+                  {(loginMutation.error as any)?.response?.data?.message ||
+                    "Credenciais inválidas."}
+                </Alert>
+              )}
+
+              <Button
+                type="submit"
+                loading={loginMutation.isPending}
+                fullWidth
+                size="md"
+                mt="xl"
+                gradient={{ from: "teal", to: "green", deg: 105 }}
+                variant="gradient"
+              >
+                Entrar
+              </Button>
+
+              <Divider label="ou continue com" labelPosition="center" my="md" />
+
+              <Group grow>
+                <Button
+                  variant="default"
+                  leftSection={<IconBrandGoogle size={18} />}
+                  size="md"
+                >
+                  Google
+                </Button>
+                <Button
+                  variant="default"
+                  leftSection={<IconBrandGithub size={18} />}
+                  size="md"
+                >
+                  GitHub
+                </Button>
+              </Group>
+            </Stack>
+          </form>
+        </Paper>
+      </Stack>
+    </AuthLayout>
   );
 }

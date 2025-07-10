@@ -9,4 +9,6 @@ until npx prisma migrate deploy; do
   sleep 2
 done
 
+npx prisma db seed
+
 exec "$@"

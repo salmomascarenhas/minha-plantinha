@@ -1,0 +1,76 @@
+.wrapper {
+  min-height: 100vh;
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
+}
+
+.visualColumn {
+  background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-7));
+  animation: slideIn 0.5s ease-out;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.title {
+  color: var(--mantine-color-green-6);
+  font-size: rem(46px);
+  line-height: 1.1;
+  max-width: rem(500px);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.text {
+  max-width: rem(500px);
+  opacity: 0.9;
+  animation: fadeIn 0.7s ease-out;
+}
+
+.formWrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--mantine-spacing-xl);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.formHeader {
+  padding: var(--mantine-spacing-md) 0;
+  margin-bottom: var(--mantine-spacing-md);
+}
+
+.logoLink {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s;
+}
+
+.logoLink:hover {
+  transform: scale(1.05);
+}
+
+.formColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,16 @@
+.wrapper {
+  position: relative;
+  padding-top: 120px;
+  padding-bottom: 80px;
+}
+
+.supraTitle {
+  font-size: 5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+}

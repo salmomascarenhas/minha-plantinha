@@ -13,15 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum InsightType {
+  HEALTH_REPORT
+  DAILY_TIP
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String
   password  String
+  points    Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  plants Plant[]
+  plants          Plant[]
+  UserAchievement UserAchievement[]
 }
 
 model Plant {
@@ -37,6 +44,7 @@ model Plant {
   user       User         @relation(fields: [userId], references: [id])
   userId     String
   SensorData SensorData[]
+  AiInsight  AiInsight[]
 }
 
 model SensorData {
@@ -45,6 +53,39 @@ model SensorData {
   humidity    Float
   luminosity  Float
   createdAt   DateTime @default(now())
+
+  plant   Plant  @relation(fields: [plantId], references: [id])
+  plantId String
+}
+
+model Achievement {
+  id          String @id @default(uuid())
+  code        String @unique
+  name        String
+  description String
+  icon        String
+
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id         String   @id @default(uuid())
+  unlockedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  achievementId String
+
+  @@unique([userId, achievementId])
+}
+
+model AiInsight {
+  id        String      @id @default(uuid())
+  type      InsightType // Tipo de insight (Relatório, Dica, etc.)
+  content   String      @db.Text // Usamos @db.Text para textos potencialmente longos
+  createdAt DateTime    @default(now())
 
   plant   Plant  @relation(fields: [plantId], references: [id])
   plantId String

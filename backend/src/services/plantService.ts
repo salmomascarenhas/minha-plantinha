@@ -1,6 +1,7 @@
 import { Plant, Prisma, PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { ConflictError } from '../errors/httpErrors';
+import * as gamificationService from './gamificationService';
 
 const prisma = new PrismaClient();
 
@@ -31,8 +32,10 @@ export const createPlant = async (
     },
   });
 
-  const { apiKey: plantApiKe, ...plantWithoutApiKey } = newPlant;
+  await gamificationService.addPoints(userId, 100, `Cadastro da planta: ${newPlant.name}`);
+  await gamificationService.unlockAchievement(userId, 'FIRST_PLANT');
 
+  const { apiKey: plantApiKe, ...plantWithoutApiKey } = newPlant;
   return { plant: plantWithoutApiKey, apiKey };
 };
 
