@@ -1,0 +1,10 @@
+.browserFrame {
+  overflow: hidden;
+  background-color: var(--mantine-color-dark-7);
+}
+
+.browserDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
