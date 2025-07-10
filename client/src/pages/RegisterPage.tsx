@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  Alert,
   Anchor,
   Button,
   Divider,
@@ -13,7 +14,14 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import {
+  IconAlertCircle,
+  IconBrandGithub,
+  IconBrandGoogle,
+  IconLock,
+  IconMail,
+  IconUser,
+} from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router";
 import { AuthLayout } from "../layouts/AuthLayout";
@@ -63,28 +71,40 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <Stack p="xl">
-        <Title ta="center">Crie sua Conta</Title>
-        <Text c="dimmed" size="sm" ta="center" mt={5}>
-          Já tem uma conta?{" "}
-          <Anchor size="sm" component={Link} to="/login">
-            Faça o login
-          </Anchor>
-        </Text>
+      <Stack gap="lg">
+        <div>
+          <Title order={2} ta="center" mt="md">
+            Crie sua Conta
+          </Title>
+          <Text c="dimmed" size="sm" ta="center" mt={5}>
+            Já tem uma conta?{" "}
+            <Anchor size="sm" component={Link} to="/login">
+              Faça o login
+            </Anchor>
+          </Text>
+        </div>
 
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">
           <Stack>
             <Group grow mb="md" mt="md">
-              <Button leftSection={<IconBrandGoogle />} variant="default">
-                Continuar com Google
+              <Button
+                leftSection={<IconBrandGoogle size={18} />}
+                variant="default"
+                size="md"
+              >
+                Google
               </Button>
-              <Button leftSection={<IconBrandGithub />} variant="default">
-                Continuar com GitHub
+              <Button
+                leftSection={<IconBrandGithub size={18} />}
+                variant="default"
+                size="md"
+              >
+                GitHub
               </Button>
             </Group>
 
             <Divider
-              label="Ou continue com seu e-mail"
+              label="Ou registre-se com seu e-mail"
               labelPosition="center"
               my="sm"
             />
@@ -94,39 +114,52 @@ export function RegisterPage() {
                 registerMutation.mutate(values)
               )}
             >
-              <Stack>
+              <Stack gap="md">
                 <TextInput
-                  withAsterisk
+                  required
                   label="Nome"
-                  placeholder="Seu nome"
+                  placeholder="Seu nome completo"
+                  leftSection={<IconUser size={18} />}
                   {...form.getInputProps("name")}
                 />
+
                 <TextInput
-                  withAsterisk
+                  required
                   label="Email"
                   placeholder="voce@exemplo.com"
+                  leftSection={<IconMail size={18} />}
                   {...form.getInputProps("email")}
                 />
 
                 <PasswordInput
-                  withAsterisk
+                  required
                   label="Senha"
-                  placeholder="Sua senha"
+                  placeholder="Crie uma senha forte"
+                  leftSection={<IconLock size={18} />}
+                  description="Use 8+ caracteres com uma mistura de letras, números e símbolos"
                   {...form.getInputProps("password")}
                 />
 
                 {registerMutation.isError && (
-                  <Text c="red" size="sm">
+                  <Alert
+                    color="red"
+                    variant="light"
+                    title="Erro ao criar conta"
+                    icon={<IconAlertCircle />}
+                  >
                     {(registerMutation.error as any)?.response?.data?.message ||
                       "Erro ao criar conta."}
-                  </Text>
+                  </Alert>
                 )}
 
                 <Button
                   type="submit"
                   loading={registerMutation.isPending}
                   fullWidth
+                  size="md"
                   mt="xl"
+                  gradient={{ from: "teal", to: "green", deg: 105 }}
+                  variant="gradient"
                 >
                   Criar Conta
                 </Button>
