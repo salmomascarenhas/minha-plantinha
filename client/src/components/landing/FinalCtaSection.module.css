@@ -1,0 +1,24 @@
+.wrapper {
+  color: white;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+@keyframes button-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+}
+
+.ctaButton {
+  animation: button-glow 4s ease-in-out infinite;
+}
