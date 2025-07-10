@@ -12,11 +12,14 @@ services:
       - '5432:5432'
     volumes:
       - db_data:/var/lib/postgresql/data
-  app:
+    networks:
+      - app-network
+
+  backend:
     build:
       context: .
       target: dev
-    container_name: minha-plantinha-app
+    container_name: minha-plantinha-backend
     restart: always
     env_file:
       - .env
@@ -31,7 +34,28 @@ services:
       - ./.env:/app/.env
       - ./package.json:/app/package.json
       - ./package-lock.json:/app/package-lock.json
-      - ./public:/app/public
-      - ./views:/app/views
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./client
+      target: dev
+    container_name: minha-plantinha-frontend
+    restart: always
+    ports:
+      - '5173:5173'
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
   db_data:
