@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15
+    container_name: minha-plantinha-db
+    restart: always
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: johndoe
+      POSTGRES_PASSWORD: randompassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-dev}
+    container_name: minha-plantinha-backend
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+      - ./backend/tsconfig.json:/app/tsconfig.json
+      - ./backend/.env:/app/.env
+      - ./backend/package.json:/app/package.json
+      - ./backend/package-lock.json:/app/package-lock.json
+      - /app/node_modules
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-dev}
+    env_file:
+      - .env
+    container_name: minha-plantinha-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
