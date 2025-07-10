@@ -1,23 +1,37 @@
-import { Center, Grid, Loader, Paper, Stack, Text, Title } from '@mantine/core';
-import { IconDroplet, IconSun, IconTemperature } from '@tabler/icons-react';
-import { useQuery } from '@tanstack/react-query';
-import { HistoryChart } from '../components/dashboard/HistoryChart';
-import { NoPlantView } from '../components/dashboard/NoPlantView';
-import { SensorCard } from '../components/dashboard/SensorCard';
-import api from '../services/apiService';
+import { Center, Grid, Loader, Paper, Stack, Text, Title } from "@mantine/core";
+import { IconDroplet, IconSun, IconTemperature } from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
+import { GamificationStatus } from "../components/dashboard/GamificationStatus";
+import { HistoryChart } from "../components/dashboard/HistoryChart";
+import { ManualControls } from "../components/dashboard/ManualControls";
+import { MascotDisplay } from "../components/dashboard/MascotDisplay";
+import { NoPlantView } from "../components/dashboard/NoPlantView";
+import { SensorCard } from "../components/dashboard/SensorCard";
+import api from "../services/apiService";
 
 export function DashboardPage() {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['myPlantData'],
-    queryFn: () => api.get('/plants/my-plant').then((res) => res.data),
-    retry: (failureCount, error: any) => {
-      // Não tenta novamente se o erro for 404 (planta não encontrada)
-      if (error.response?.status === 404) return false;
-      return failureCount < 3;
-    },
+  const {
+    data: plantData,
+    isLoading: isLoadingPlant,
+    isError: isErrorPlant,
+    error: plantError,
+  } = useQuery({
+    queryKey: ["myPlantData"],
+    queryFn: () => api.get("/plants/my-plant").then((res) => res.data),
+    retry: (failureCount, error: any) =>
+      error.response?.status !== 404 && failureCount < 3,
   });
 
-  if (isLoading) {
+  const { data: gamificationData, isLoading: isLoadingGamification } = useQuery(
+    {
+      queryKey: ["gamificationStatus"],
+      queryFn: () =>
+        api.get("/api/gamification/status").then((res) => res.data),
+      enabled: !!plantData,
+    }
+  );
+
+  if (isLoadingPlant) {
     return (
       <Center h="80vh">
         <Loader size="xl" />
@@ -25,12 +39,11 @@ export function DashboardPage() {
     );
   }
 
-  // Tratamento específico para o erro 404
-  if (isError && (error as any).response?.status === 404) {
+  if (isErrorPlant && (plantError as any).response?.status === 404) {
     return <NoPlantView />;
   }
 
-  if (isError || !data) {
+  if (isErrorPlant || !plantData) {
     return (
       <Center h="80vh">
         <Text c="red">Erro ao carregar dados do dashboard.</Text>
@@ -38,25 +51,29 @@ export function DashboardPage() {
     );
   }
 
-  const { plant } = data;
+  const { plant } = plantData;
   const latestReading = plant.SensorData?.[0];
 
   return (
     <Stack gap="xl">
       <Title order={1}>Painel de Controle: {plant.name}</Title>
+
+      {isLoadingGamification ? (
+        <Paper p="lg" radius="md" withBorder>
+          <Loader size="sm" />
+        </Paper>
+      ) : (
+        gamificationData && <GamificationStatus {...gamificationData} />
+      )}
+
       <Grid>
         <Grid.Col span={{ base: 12, md: 8 }}>
-          {/* Coluna Principal com o Gráfico (e futuramente, o mascote) */}
           <Stack>
-            {/* Aqui entrará o MascoteDisplay.tsx */}
-            <Paper p="md" h={200}>
-              <Center>Espaço do Mascote (Rive)</Center>
-            </Paper>
+            <MascotDisplay humidity={latestReading?.humidity} />
             <HistoryChart plantId={plant.id} />
           </Stack>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
-          {/* Coluna Lateral com Sensores e Controles */}
           <Stack>
             {latestReading ? (
               <>
@@ -87,7 +104,7 @@ export function DashboardPage() {
                 <Text>Aguardando primeira leitura do dispositivo...</Text>
               </Paper>
             )}
-            {/* Aqui entrarão os Controles Manuais */}
+            <ManualControls plantId={plant.id} />
           </Stack>
         </Grid.Col>
       </Grid>
