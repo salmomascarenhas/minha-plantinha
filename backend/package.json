@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/salmomascarenhas/minha-plantinha#readme",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.10.1",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",

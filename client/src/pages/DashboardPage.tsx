@@ -10,8 +10,9 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDroplet, IconSun, IconTemperature } from "@tabler/icons-react";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { AiAssistant } from "../components/dashboard/AiAssistant";
 import { ApiKeyDisplayModal } from "../components/dashboard/ApiKeyDisplayModal";
 import { GamificationStatus } from "../components/dashboard/GamificationStatus";
 import { HistoryChart } from "../components/dashboard/HistoryChart";
@@ -23,6 +24,7 @@ import { SensorCard } from "../components/dashboard/SensorCard";
 import api from "../services/apiService";
 
 export function DashboardPage() {
+  const queryClient = useQueryClient();
   const [
     registerModalOpened,
     { open: openRegisterModal, close: closeRegisterModal },
@@ -40,6 +42,15 @@ export function DashboardPage() {
     setNewlyGeneratedApiKey(null);
   };
 
+  // Função para gerenciar o reetch do React Query
+  useEffect(() => {
+    if (registerModalOpened) {
+      queryClient.setQueryDefaults(["myPlantData"], { refetchInterval: false });
+    } else {
+      queryClient.setQueryDefaults(["myPlantData"], { refetchInterval: 10000 });
+    }
+  }, [registerModalOpened, queryClient]);
+
   const {
     data: plantData,
     isLoading: isLoadingPlant,
@@ -51,8 +62,7 @@ export function DashboardPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     retry: (failureCount, error: any) =>
       error.response?.status !== 404 && failureCount < 3,
-    refetchInterval: 10000,
-  });
+  }); // Remove o refetchInterval daqui pois agora é gerenciado dinamicamente
 
   const { data: gamificationData, isLoading: isLoadingGamification } = useQuery(
     {
@@ -124,6 +134,7 @@ export function DashboardPage() {
                 <Grid.Col span={{ base: 12, md: 8 }}>
                   <Stack>
                     <MascotDisplay humidity={latestReading?.humidity} />
+                    <AiAssistant plantId={plant.id} />
                     <HistoryChart plantId={plant.id} />
                   </Stack>
                 </Grid.Col>
