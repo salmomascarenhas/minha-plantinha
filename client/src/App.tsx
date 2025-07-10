@@ -1,4 +1,4 @@
-import { AppShell } from "@mantine/core";
+import { AppShell, Center, Loader } from "@mantine/core";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import { PublicHeader } from "./components/PublicHeader";
 
@@ -10,7 +10,16 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 
 function MainLayout() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Center h="100vh">
+        <Loader size="lg" />
+      </Center>
+    );
+  }
+
   return (
     <AppShell header={{ height: 60 }} padding="md">
       <AppShell.Header>{!isAuthenticated && <PublicHeader />}</AppShell.Header>
