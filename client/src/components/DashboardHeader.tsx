@@ -1,15 +1,15 @@
-import { Button, Group, Text } from '@mantine/core';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../hooks/useAuth';
-import { ThemeToggleButton } from './ThemeToggleButton';
+import { Button, Group, Text } from "@mantine/core";
+import { useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import { ThemeToggleButton } from "./ThemeToggleButton";
 
-export function Header() {
+export function DashboardHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -18,7 +18,7 @@ export function Header() {
         🌱 Minha Plantinha
       </Text>
       <Group>
-        <Text size="sm">Olá, {user?.name || 'Usuário'}!</Text>
+        <Text size="sm">Olá, {user?.name || "Usuário"}!</Text>
         <ThemeToggleButton />
         <Button variant="default" onClick={handleLogout}>
           Sair
