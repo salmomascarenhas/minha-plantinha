@@ -46,13 +46,13 @@ chmod +x docker-manager.sh
 
 ```bash
 # Desenvolvimento
-NODE_ENV=development docker-compose --env-file .env.development up
+NODE_ENV=development docker compose --env-file .env.development up
 
 # Produção
-NODE_ENV=production docker-compose --env-file .env.production up
+NODE_ENV=production docker compose --env-file .env.production up
 
 # Build específico
-NODE_ENV=production docker-compose --env-file .env.production up --build
+NODE_ENV=production docker compose --env-file .env.production up --build
 ```
 
 ## 🔧 Configuração de Variáveis de Ambiente
@@ -109,13 +109,13 @@ NODE_ENV=production docker-compose --env-file .env.production up --build
 docker ps
 
 # Logs específicos
-docker-compose logs backend
-docker-compose logs frontend
-docker-compose logs db
+docker compose logs backend
+docker compose logs frontend
+docker compose logs db
 
 # Rebuild específico
-docker-compose build backend
-docker-compose build frontend
+docker compose build backend
+docker compose build frontend
 
 # Limpeza completa
 ./docker-manager.sh clean
@@ -149,10 +149,10 @@ docker-compose build frontend
 4. **Database connection issues**
    ```bash
    # Verificar se o banco está rodando
-   docker-compose logs db
+   docker compose logs db
    
    # Resetar volumes se necessário
-   docker-compose down -v
+   docker compose down -v
    ```
 
 ## 🚀 Deploy em Produção
@@ -188,8 +188,8 @@ docker-compose build frontend
 ./docker-manager.sh logs
 
 # Logs específicos
-docker-compose logs -f backend
-docker-compose logs -f frontend
+docker compose logs -f backend
+docker compose logs -f frontend
 ```
 
 ---

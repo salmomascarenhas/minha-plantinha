@@ -51,7 +51,10 @@ export NODE_ENV=$ENV
 # Load environment variables
 if [ -f ".env.$ENV" ]; then
     echo -e "${GREEN}📄 Loading .env.$ENV${NC}"
-    export $(cat .env.$ENV | grep -v '^#' | xargs)
+    # Use a more robust method to load env vars
+    set -o allexport
+    source ".env.$ENV"
+    set +o allexport
 else
     echo -e "${YELLOW}⚠️  .env.$ENV not found, using defaults${NC}"
 fi
@@ -60,34 +63,34 @@ fi
 case $1 in
     "up")
         echo -e "${GREEN}🚀 Starting Minha Plantinha in $ENV mode...${NC}"
-        docker-compose --env-file .env.$ENV up -d
+        docker compose --env-file .env.$ENV up -d
         echo -e "${GREEN}✅ Application started!${NC}"
         echo -e "${BLUE}🌐 Frontend: http://localhost:${FRONTEND_PORT:-5173}${NC}"
         echo -e "${BLUE}🔧 Backend: http://localhost:${BACKEND_PORT:-3000}${NC}"
         ;;
     "down")
         echo -e "${YELLOW}🛑 Stopping Minha Plantinha...${NC}"
-        docker-compose down
+        docker compose down
         echo -e "${GREEN}✅ Application stopped!${NC}"
         ;;
     "build")
         echo -e "${BLUE}🔨 Building Minha Plantinha for $ENV...${NC}"
-        docker-compose --env-file .env.$ENV build --no-cache
+        docker compose --env-file .env.$ENV build --no-cache
         echo -e "${GREEN}✅ Build completed!${NC}"
         ;;
     "restart")
         echo -e "${YELLOW}🔄 Restarting Minha Plantinha...${NC}"
-        docker-compose down
-        docker-compose --env-file .env.$ENV up -d
+        docker compose down
+        docker compose --env-file .env.$ENV up -d
         echo -e "${GREEN}✅ Application restarted!${NC}"
         ;;
     "logs")
         echo -e "${BLUE}📋 Showing logs...${NC}"
-        docker-compose logs -f --tail=100
+        docker compose logs -f --tail=100
         ;;
     "clean")
         echo -e "${RED}🧹 Cleaning up Docker resources...${NC}"
-        docker-compose down -v
+        docker compose down -v
         docker system prune -f
         echo -e "${GREEN}✅ Cleanup completed!${NC}"
         ;;
