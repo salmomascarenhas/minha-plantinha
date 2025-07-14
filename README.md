@@ -1,22 +1,22 @@
 # 🌿 Minha Plantinha: Sistema de Irrigação Gamificado
+
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![Mantine](https://img.shields.io/badge/Mantine-339AF0?style=for-the-badge&logo=mantine&logoColor=white)
-![Rive](https://img.shields.io/badge/Rive-E85599?style=for-the-badge&logo=rive&logoColor=white)
-
-## 📄 Índice
-1.  [🎯 Sobre o Projeto](#-sobre-o-projeto)
-2.  [✨ Funcionalidades Principais](#-funcionalidades-principais)
-3.  [🏗️ Arquitetura do Sistema](#️-arquitetura-do-sistema)
-4.  [🛠️ Stack de Tecnologias](#️-stack-de-tecnologias)
-5.  [🚀 Como Rodar o Projeto](#-como-rodar-o-projeto)
-6.  [✅ Andamento e Próximos Passos](#-andamento-e-próximos-passos)
-7.  [👨‍💻 Equipe](#-equipe)
 
 ## 🎯 Sobre o Projeto
-"Minha Plantinha" é um sistema que busca transformar o cuidado com plantas em uma experiência interativa, divertida e emocionalmente recompensadora. A plataforma integra uma **interface web gamificada** com um **dispositivo embarcado (ESP32)** para monitorar e controlar um sistema de irrigação automático.
+
+Sistema gamificado que transforma o cuidado com plantas em uma experiência interativa e emocionalmente recompensadora. Integra uma **interface web** com um **dispositivo ESP32** para monitoramento e controle automático de irrigação.
+
+**🌟 Destaques:**
+- 🪴 Gestão de plantas com pareamento IoT
+- 📊 Monitoramento em tempo real (umidade, temperatura, luminosidade)  
+- 🎮 Sistema de gamificação com mascote virtual "Caquito"
+- 💧 Controle remoto de irrigação e proteção
+- 🤖 Assistente com IA para dicas personalizadas
+- 📈 Histórico e gráficos de dados dos sensores
 
 O coração do projeto é o "Caquito", um mascote virtual cujas emoções e reações refletem o estado de saúde da planta real, com base nos dados coletados por sensores de umidade, temperatura e luminosidade. O objetivo é engajar o usuário no cuidado diário, fortalecer o vínculo com a natureza e promover a consciência ambiental de forma lúdica.
 
@@ -53,142 +53,107 @@ O projeto é modular e segue uma arquitetura de três camadas principais, basead
 | **Inteligência Artificial**| `LLM (Gemini)` | Geração de conteúdo dinâmico, como dicas e relatórios. |
 
 ## 🚀 Como Rodar o Projeto
-O projeto suporta configurações multi-ambiente com Docker, permitindo execução tanto em **desenvolvimento** quanto em **produção** com otimizações específicas para cada cenário.
 
-### **📋 Pré-requisitos:**
-* `Git` (versão 2.0+)
-* `Docker` (versão 20.0+)
-* `Docker Compose` (versão 2.0+)
+### **📋 Pré-requisitos**
+- Git (2.0+)
+- Docker (20.0+) 
+- Docker Compose (2.0+)
 
-### **⚙️ Configuração Inicial:**
+### **⚡ Setup Rápido**
 
 ```bash
-# 1. Clone o repositório
+# 1. Clone e entre no projeto
 git clone https://github.com/salmomascarenhas/minha-plantinha.git
-
-# 2. Navegue até o diretório do projeto
 cd minha-plantinha
 
-# 3. Configure as variáveis de ambiente
-# Copie os arquivos de exemplo para cada ambiente
-cp .env.example .env.development
-cp .env.example .env.production
+# 2. Configure o ambiente desejado
+cp .env.development .env.development  # Já configurado para desenvolvimento
+cp .env.production .env.production    # Configure suas credenciais de produção
 
-# 4. Preencha as variáveis de ambiente para cada cenário
-# .env.development - Para desenvolvimento local
-# .env.production  - Para ambiente de produção
+# 3. Execute o ambiente desejado
+./docker-manager.sh up dev    # Desenvolvimento
+./docker-manager.sh up prod   # Produção
 ```
 
-### **🔧 Configuração de Variáveis de Ambiente:**
+### **🔧 Configuração de Produção**
 
-#### **📁 `.env.development` (Desenvolvimento):**
+Para produção, **edite** `.env.production` com credenciais seguras:
+
 ```env
-# Ambiente
-NODE_ENV=development
-
-# Servidor
-BACKEND_PORT=3000
-FRONTEND_PORT=5173
-
-# Banco de Dados
-DATABASE_URL="postgresql://user:password@localhost:5432/minha_plantinha_dev"
-
-# Autenticação
-JWT_SECRET="seu_jwt_secret_desenvolvimento"
-
-# API Externa (LLM)
-GEMINI_API_KEY="sua_api_key_gemini"
+# IMPORTANTES: Altere estas configurações!
+POSTGRES_PASSWORD=SUA_SENHA_FORTE_AQUI
+JWT_SECRET=SUA_CHAVE_JWT_SUPER_SEGURA_64_CARACTERES
+GEMINI_API_KEY=sua-chave-api-gemini-producao
 ```
 
-#### **📁 `.env.production` (Produção):**
-```env
-# Ambiente
-NODE_ENV=production
+### **🎛️ Comandos Disponíveis**
 
-# Servidor
-BACKEND_PORT=3000
-FRONTEND_PORT=80
-
-# Banco de Dados
-DATABASE_URL="postgresql://user:password@localhost:5432/minha_plantinha_prod"
-
-# Autenticação
-JWT_SECRET="seu_jwt_secret_super_seguro_producao"
-
-# API Externa (LLM)
-GEMINI_API_KEY="sua_api_key_gemini_producao"
-```
-
-### **🚀 Execução dos Ambientes:**
-
-#### **💻 Ambiente de Desenvolvimento:**
 ```bash
-# Iniciar aplicação em modo desenvolvimento
-./docker-manager.sh up dev
+# Gerenciamento geral
+./docker-manager.sh up dev|prod     # Iniciar ambiente
+./docker-manager.sh down            # Parar aplicação  
+./docker-manager.sh build dev|prod  # Build imagens
+./docker-manager.sh restart prod    # Restart produção
+./docker-manager.sh logs            # Ver logs
 
-# Ou usando docker-compose diretamente
-docker compose --env-file .env.development up -d
-
-# Build apenas (sem iniciar)
-./docker-manager.sh build dev
-
-# Parar aplicação
-./docker-manager.sh down
-
-# Ver logs em tempo real
-./docker-manager.sh logs
+# Verificação
+docker ps                           # Status dos containers
+curl http://localhost:3000/health   # Health check da API
 ```
 
-**Acessos em Desenvolvimento:**
-- 🌐 **Frontend:** http://localhost:5173
-- 🔧 **Backend API:** http://localhost:3000/api
-- 💚 **Health Check:** http://localhost:3000/health
-- 📚 **Swagger Docs:** http://localhost:3000/api-docs
+### **🌐 Acessos por Ambiente**
 
-#### **🏭 Ambiente de Produção:**
-```bash
-# Iniciar aplicação em modo produção
-./docker-manager.sh up prod
+| Ambiente | Frontend | Backend API | Health Check |
+|----------|----------|-------------|--------------|
+| **Desenvolvimento** | http://localhost:5173 | http://localhost:3000/api | http://localhost:3000/health |
+| **Produção** | http://localhost | http://localhost/api | http://localhost:3000/health |
+## ✅ Status do Projeto
 
-# Ou usando docker-compose diretamente
-docker compose --env-file .env.production up -d
+### **🏆 Concluído:**
+- [x] 🔐 Autenticação JWT (cadastro, login)
+- [x] 🪴 Gestão de plantas e pareamento ESP32 
+- [x] 📊 Dashboard com monitoramento em tempo real
+- [x] 💧 Controle remoto de atuadores
+- [x] 🎮 Sistema de gamificação e pontuação
+- [x] � Histórico e visualização de dados
+- [x] 🌐 Interface responsiva com tema claro/escuro
+- [x] 🐳 Deploy multi-ambiente (dev/prod) com Docker
+- [x] 🔧 Pipeline automatizado com nginx e proxy reverso
 
-# Build apenas (sem iniciar)
-./docker-manager.sh build prod
+### **🚧 Em Desenvolvimento:**
+- [⏳] 🤖 Assistente com IA (integração LLM)
 
-# Restart completo
-./docker-manager.sh restart prod
+### **📅 Próximos Passos:**
+- [ ] � Código ESP32 para sensores e atuadores
+- [ ] 🔗 Comunicação IoT (REST/MQTT)
+- [ ] 🧪 Testes automatizados
+- [ ] 🔒 HTTPS e certificados SSL
 
-# Limpar recursos Docker
-./docker-manager.sh clean
-```
+## 🛠️ Stack Tecnológica
 
-**Acessos em Produção:**
-- 🌐 **Frontend:** http://localhost (porta 80)
-- 🔧 **Backend API:** http://localhost/api/* (proxy via nginx)
-- 💚 **Health Check:** http://localhost:3000/health (direto)
-- 🗄️ **Database:** localhost:5432
+| Categoria | Tecnologia | Finalidade |
+|-----------|------------|------------|
+| **Frontend** | React + Mantine | UI moderna e responsiva |
+| **Backend** | Node.js + Express | API REST robusta |
+| **Banco** | PostgreSQL + Prisma | Dados persistentes e ORM |
+| **Auth** | JWT | Autenticação segura |
+| **Deploy** | Docker + Nginx | Containerização e proxy |
+| **IoT** | ESP32 + Sensores | Hardware embarcado |
+| **IA** | Google Gemini | Assistente inteligente |
 
-### **📊 Verificação de Status:**
-```bash
-# Ver containers rodando
-docker ps
+## 👨‍💻 Equipe
 
-# Ver logs específicos de um serviço
-docker logs frontend-production
-docker logs backend-production
-docker logs db-production
+| Nome | Matrícula | E-mail |
+|------|-----------|--------|
+| Francisco Cassiano de Vasconcelos Souza | 413067 | casinho.555@gmail.com |
+| Salmo da Cruz Mascarenhas | 431447 | salmo.cruz@gmail.com |
+| Akyla de Aquino Pinto | 412723 | akylaaquino@hotmail.com |
 
-# Verificar saúde da aplicação
-curl http://localhost/api/auth/register -X POST -H "Content-Type: application/json" -d '{}'
-```
+---
 
-### **🔍 Diferenças entre Ambientes:**
-
-| Aspecto | Desenvolvimento | Produção |
-|---------|----------------|----------|
-| **Build** | Hot reload, source maps | Otimizado, minificado |
-| **Frontend Port** | 5173 | 80 |
+### **📚 Documentação Avançada**
+- 📖 [Guia de Deploy Avançado](./docs/DOCKER_DEPLOYMENT.md)
+- 🔧 [Configuração Detalhada de Ambiente](./docs/ENV_CONFIG.md)
 | **Servidor Web** | Vite dev server | Nginx + proxy reverse |
 | **SSL/HTTPS** | HTTP | Pronto para HTTPS |
 | **Logs** | Verbose | Otimizado |
@@ -202,67 +167,8 @@ curl http://localhost/api/auth/register -X POST -H "Content-Type: application/js
 - 🔄 **Updates:** Use `./docker-manager.sh restart prod` para aplicar mudanças
 - 📦 **Volumes:** Dados do banco são persistidos entre restarts
 
-### **📚 Documentação Adicional:**
-- 📖 **[DOCKER_DEPLOYMENT.md](./DOCKER_DEPLOYMENT.md)** - Guia completo de deploy e troubleshooting
-- 🔧 **[ENV_CONFIG.md](./ENV_CONFIG.md)** - Configuração detalhada de ambientes
-- 🐳 **[docker-manager.sh](./docker-manager.sh)** - Script de gerenciamento Docker
-
-## ✅ Andamento e Próximos Passos
-Acompanhe aqui o status de desenvolvimento de cada funcionalidade.
-
-  * [x] **Fase 0: Planejamento e Configuração**
-      * [x] Definição do escopo e requisitos do projeto.
-      * [x] Definição da arquitetura e da stack de tecnologias.
-      * [x] Criação da estrutura inicial do projeto e do `README`.
-      * [x] **🐳 Configuração Docker Multi-Ambiente** (DEV/PROD)
-      * [x] **🔧 Pipeline de Deploy Automatizado**
-
-  * [x] **Fase 1: Backend (API & Lógica de Negócio)**
-      * [x] `PLT-001`: Implementar rotas de autenticação (cadastro, login) com JWT.
-      * [x] `PLT-002`: Implementar endpoints CRUD para gerenciamento de plantas e pareamento com o ESP32.
-      * [x] Criar endpoints para receber e armazenar os dados dos sensores.
-      * [x] `PLT-004`: Criar endpoints para acionamento remoto dos atuadores.
-      * [x] `PLT-005`: Modelar e implementar a lógica de gamificação (pontuação e conquistas).
-      * [x] `PLT-007`: Desenvolver endpoints para consulta de histórico de dados.
-      * [x] **🏭 Build de Produção Otimizado** (Multi-stage Docker)
-      
-  * [x] **Fase 2: Frontend (UI & Integração)**
-      * [x] Construir as telas de Login e Cadastro.
-      * [x] Desenvolver o Dashboard principal.
-      * [x] `PLT-003`: Integrar o dashboard com a API para exibir dados em tempo real.
-      * [x] Implementar a interface de controle remoto.
-      * [x] `PLT-007`: Criar os gráficos para a visualização do histórico.
+### **📚 Documentação Avançada**
+- 📖 [Guia de Deploy Avançado](./docs/DOCKER_DEPLOYMENT.md)
+- 🔧 [Configuração Detalhada de Ambiente](./docs/ENV_CONFIG.md)
       * [x] **🌐 Deploy de Produção com Nginx** (Proxy reverso + Otimizações)
-      * [x] Implementar o tema claro/escuro.
-
-  * [x] **🚀 Fase Extra: DevOps & Infraestrutura**
-      * [x] **Docker Multi-Ambiente:** Configurações separadas para DEV/PROD
-      * [x] **Nginx Reverse Proxy:** Frontend servido via nginx com proxy para API
-      * [x] **Build Otimizado:** Multi-stage builds para imagens menores
-      * [x] **Health Checks:** Monitoramento de saúde dos containers
-      * [x] **Script de Gerenciamento:** `docker-manager.sh` para facilitar deploys
-      * [x] **Documentação de Deploy:** Guias completos para produção
-    
-  * [ ] **Fase 3: IoT (Dispositivo Embarcado)**
-      * [ ] Desenvolver o código para o ESP32 ler os sensores de umidade, temperatura e luminosidade.
-      * [ ] Implementar a comunicação (via REST ou MQTT) para enviar os dados ao backend.
-      * [ ] Implementar a lógica para receber comandos do backend e acionar a bomba e o motor.
-
-  * [ ] **Fase 4: Funcionalidades Avançadas**
-      * [⏳] `PLT-006`: Integrar com a API do LLM para gerar as dicas do assistente virtual.
-      * [ ] Implementar testes de unidade e integração.
-      * [ ] Configurar pipeline de CI/CD (GitHub Actions).
-
-  * [ ] **Fase 5: Melhorias Extras (Opcional)**
-      * [ ] Permitir que o usuário se conecte ao hardware utilizando uma interface para detectar dispositivos na rede.
-      * [ ] Integrar Frontend com uma biblioteca reativa moderna.
-      * [ ] Refinar o design da interface.
-      * [ ] **🔒 HTTPS & SSL:** Configuração para produção com certificados
-      * [ ] **📊 Monitoramento:** Integração com ferramentas de observabilidade
-      
-# 👨‍💻 Equipe
-| Nome | Matrícula | E-mail |
-| :--- | :--- | :--- |
-| Francisco Cassiano de Vasconcelos Souza | 413067 | casinho.555@gmail.com
-Salmo da Cruz Mascarenhas | 431447 | salmo.cruz@gmail.com
-Akyla de Aquino Pinto | 412723 | akylaaquino@hotmail.com 
+ 
