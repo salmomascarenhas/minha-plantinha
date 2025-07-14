@@ -29,7 +29,9 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.${NODE_ENV:-development}
+      dockerfile: Dockerfile.prod
+      args:
+        - NODE_ENV=${NODE_ENV:-development}
     container_name: backend-${NODE_ENV:-development}
     restart: unless-stopped
     env_file:
@@ -61,7 +63,9 @@ services:
   frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile.${NODE_ENV:-development}
+      dockerfile: Dockerfile.prod
+      args:
+        - NODE_ENV=${NODE_ENV:-development}
     container_name: frontend-${NODE_ENV:-development}
     restart: unless-stopped
     env_file:
@@ -73,8 +77,9 @@ services:
       - VITE_APP_TITLE=${VITE_APP_TITLE}
       - VITE_APP_VERSION=${VITE_APP_VERSION}
       - VITE_DEBUG_MODE=${VITE_DEBUG_MODE}
+      - BACKEND_PORT=${BACKEND_PORT:-3000}
     ports:
-      - "${FRONTEND_PORT:-5173}:${FRONTEND_PORT:-5173}"
+      - "${FRONTEND_PORT:-5173}:80"
     volumes:
       # Development volumes (ignored in production)
       - ./client:/app
