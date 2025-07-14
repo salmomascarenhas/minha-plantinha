@@ -1,37 +1,58 @@
+# ==============================================
+# DOCKER COMPOSE - MULTI ENVIRONMENT
+# ==============================================
+
 services:
   db:
-    image: postgres:15
-    container_name: minha-plantinha-db
-    restart: always
+    image: postgres:15-alpine
+    container_name: db-${NODE_ENV:-development}
+    restart: unless-stopped
+    env_file:
+      - .env
+      - .env.${NODE_ENV:-development}
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: johndoe
-      POSTGRES_PASSWORD: randompassword
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data_${NODE_ENV:-development}:/var/lib/postgresql/data
+      - ./backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
-      target: ${NODE_ENV:-dev}
-    container_name: minha-plantinha-backend
-    restart: always
+      dockerfile: Dockerfile.${NODE_ENV:-development}
+    container_name: backend-${NODE_ENV:-development}
+    restart: unless-stopped
     env_file:
       - .env
+      - .env.${NODE_ENV:-development}
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - BACKEND_PORT=${BACKEND_PORT:-3000}
+      - BACKEND_HOST=${BACKEND_HOST:-0.0.0.0}
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT:-3000}:${BACKEND_PORT:-3000}"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
+      # Development volumes (ignored in production)
       - ./backend/src:/app/src
       - ./backend/prisma:/app/prisma
       - ./backend/tsconfig.json:/app/tsconfig.json
-      - ./backend/.env:/app/.env
       - ./backend/package.json:/app/package.json
       - ./backend/package-lock.json:/app/package-lock.json
       - /app/node_modules
@@ -41,17 +62,25 @@ services:
   frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile
-      target: ${NODE_ENV:-dev}
+      dockerfile: Dockerfile.${NODE_ENV:-development}
+    container_name: frontend-${NODE_ENV:-development}
+    restart: unless-stopped
     env_file:
       - .env
-    container_name: minha-plantinha-frontend
-    restart: always
+      - .env.${NODE_ENV:-development}
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_APP_TITLE=${VITE_APP_TITLE}
+      - VITE_APP_VERSION=${VITE_APP_VERSION}
+      - VITE_DEBUG_MODE=${VITE_DEBUG_MODE}
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-5173}:${FRONTEND_PORT:-5173}"
     volumes:
+      # Development volumes (ignored in production)
       - ./client:/app
       - /app/node_modules
+      - /app/dist
     depends_on:
       - backend
     networks:
@@ -60,6 +89,10 @@ services:
 networks:
   app-network:
     driver: bridge
+    name: minha-plantinha-${NODE_ENV:-development}
 
 volumes:
-  db_data:
+  db_data_development:
+    name: minha-plantinha-db-development
+  db_data_production:
+    name: minha-plantinha-db-production

@@ -23,28 +23,6 @@ COPY --from=build /app/prisma ./prisma
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh && apk add --no-cache dos2unix && dos2unix entrypoint.sh
 
-COPY .env .env
-
 EXPOSE 3000
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["node", "dist/app.js"]
-
-# ---------- Development stage ----------
-FROM node:20-alpine AS dev
-WORKDIR /app
-ENV NODE_ENV=development
-
-COPY package.json package-lock.json* ./
-RUN npm install --production=false
-
-COPY tsconfig.json ./
-COPY src ./src
-COPY prisma ./prisma
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh && apk add --no-cache dos2unix && dos2unix entrypoint.sh
-
-COPY .env .env
-
-EXPOSE 3000
-ENTRYPOINT ["./entrypoint.sh"]
-CMD ["npm", "run", "dev"]

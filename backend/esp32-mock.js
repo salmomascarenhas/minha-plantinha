@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const API_KEY = 'COLE_AQUI_SUA_API_KEY'; 
+const API_KEY = '418a33dbf72f2634a84fb5b9d8d9ae68e9ae0b129f8248f8e03f3b612b3db7c1'; 
 
 // --- CONFIGURAÇÃO ---
 const CONFIG = {
