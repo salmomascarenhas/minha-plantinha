@@ -30,11 +30,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("authToken", token);
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     try {
-      // Após o login, também buscamos os dados frescos do usuário
       const response = await api.get("/users/me");
       setUser(response.data);
     } catch (error) {
       console.error("Falha ao buscar dados do usuário após o login.", error);
+      localStorage.removeItem("authToken");
+      delete api.defaults.headers.common["Authorization"];
+      throw error;
     }
   };
 

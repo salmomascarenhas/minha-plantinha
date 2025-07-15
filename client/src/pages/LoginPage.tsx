@@ -58,14 +58,18 @@ export function LoginPage() {
   const loginMutation = useMutation<LoginResponse, Error, typeof form.values>({
     mutationFn: (credentials) =>
       api.post("/auth/login", credentials).then((res) => res.data),
-    onSuccess: (data) => {
-      auth.login(data.token);
-      notifications.show({
-        title: "Bem-vindo de volta!",
-        message: "Login realizado com sucesso.",
-        color: "green",
-      });
-      navigate("/dashboard");
+    onSuccess: async (data) => {
+      try {
+        await auth.login(data.token);
+        notifications.show({
+          title: "Bem-vindo de volta!",
+          message: "Login realizado com sucesso.",
+          color: "green",
+        });
+        navigate("/dashboard");
+      } catch {
+        form.setErrors({ root: "Erro ao carregar dados do usuário" });
+      }
     },
     onError: (error) => {
       form.setErrors({ root: error.message });
