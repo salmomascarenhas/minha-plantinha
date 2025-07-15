@@ -2,6 +2,7 @@
 import {
   Alert,
   Anchor,
+  Box,
   Button,
   Checkbox,
   Divider,
@@ -79,7 +80,7 @@ export function LoginPage() {
   return (
     <AuthLayout>
       <Stack gap="lg">
-        <div>
+        <Box>
           <Title order={2} ta="center" mt="md">
             Bem-vindo de volta!
           </Title>
@@ -89,7 +90,7 @@ export function LoginPage() {
               Crie uma conta
             </Anchor>
           </Text>
-        </div>
+        </Box>
 
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">
           <form
