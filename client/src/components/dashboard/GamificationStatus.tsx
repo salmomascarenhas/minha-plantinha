@@ -109,8 +109,8 @@ export function GamificationStatus({
   const playerStatus = getPlayerStatus(playerData.level);
 
   const isDark = colorScheme === "dark";
-  const primaryColor = theme.colors.myGreen[isDark ? 4 : 7];
-  const successColor = theme.colors.myGreen[isDark ? 3 : 8];
+  const primaryColor = theme.colors.myGreen[isDark ? 4 : 6];
+  const successColor = theme.colors.myGreen[isDark ? 3 : 7];
 
   useEffect(() => {
     setShowProgress(true);
@@ -171,7 +171,7 @@ export function GamificationStatus({
               </Title>
               <Text
                 size="sm"
-                c={isDark ? theme.colors.gray[4] : theme.colors.gray[7]}
+                c={isDark ? theme.colors.gray[4] : theme.colors.gray[6]}
               >
                 {playerStatus.title}
               </Text>
@@ -207,7 +207,7 @@ export function GamificationStatus({
             </Text>
             <Text
               size="xs"
-              c={isDark ? theme.colors.gray[5] : theme.colors.gray[6]}
+              c={isDark ? theme.colors.gray[5] : theme.colors.gray[5]}
             >
               {playerData.currentXP}/{playerData.requiredXP} XP
             </Text>
@@ -231,9 +231,9 @@ export function GamificationStatus({
                   root: {
                     backgroundColor: isDark
                       ? theme.colors.dark[4]
-                      : theme.colors.gray[3],
+                      : theme.colors.gray[2],
                     border: `1px solid ${
-                      isDark ? theme.colors.dark[3] : theme.colors.gray[4]
+                      isDark ? theme.colors.dark[3] : theme.colors.gray[3]
                     }`,
                   },
                   section: {
@@ -319,9 +319,9 @@ export function GamificationStatus({
               style={{
                 background: isDark
                   ? `linear-gradient(135deg, ${theme.colors.dark[6]} 0%, ${theme.colors.dark[5]} 100%)`
-                  : `linear-gradient(135deg, ${theme.colors.gray[0]} 0%, ${theme.white} 100%)`,
+                  : `linear-gradient(135deg, ${theme.colors.gray[1]} 0%, ${theme.colors.gray[0]} 100%)`,
                 border: `1px dashed ${
-                  isDark ? theme.colors.dark[3] : theme.colors.gray[5]
+                  isDark ? theme.colors.dark[3] : theme.colors.gray[4]
                 }`,
                 textAlign: "center",
               }}
