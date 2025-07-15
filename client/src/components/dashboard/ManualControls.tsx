@@ -9,9 +9,8 @@ interface ManualControlsProps {
 }
 
 type CommandBody = {
-  action: "WATER_PUMP" | "COVER";
+  action: "WATER_PUMP" | "TOGGLE_COVER";
   duration?: number;
-  state?: "TOGGLE";
 };
 
 export function ManualControls({ plantId }: ManualControlsProps) {
@@ -30,7 +29,6 @@ export function ManualControls({ plantId }: ManualControlsProps) {
         message: successMessage,
         color: "green",
       });
-
       await queryClient.invalidateQueries({ queryKey: ["gamificationStatus"] });
     },
     onError: (error) => {
@@ -45,7 +43,7 @@ export function ManualControls({ plantId }: ManualControlsProps) {
   return (
     <Paper p="md" radius="md">
       <Stack>
-        <Title order={4}>⚙️ Controles Manuais</Title>
+        <Title order={5}>⚙️ Controles Manuais</Title>
         <Group grow>
           <Button
             leftSection={<IconDroplet size={18} />}
@@ -65,10 +63,10 @@ export function ManualControls({ plantId }: ManualControlsProps) {
             variant="default"
             loading={
               sendCommandMutation.isPending &&
-              sendCommandMutation.variables?.action === "COVER"
+              sendCommandMutation.variables?.action === "TOGGLE_COVER"
             }
             onClick={() =>
-              sendCommandMutation.mutate({ action: "COVER", state: "TOGGLE" })
+              sendCommandMutation.mutate({ action: "TOGGLE_COVER" })
             }
           >
             Acionar Lona
