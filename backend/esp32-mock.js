@@ -1,27 +1,48 @@
 const axios = require('axios');
 
-const API_KEY = 'd1e97abbde0a9822bd5d2c2cf90cab26a4c3e3ca2bb89f801ca66acb9b8ad295'; 
+const API_KEY = 'a87caa2da3d5845635bd8b04cac7118e0b9c9407140e8148681bd7458663a9f7'; 
 
-// --- CONFIGURAÇÃO ---
 const CONFIG = {
   API_KEY: API_KEY, 
-  BASE_URL: 'http://localhost:3000/api', 
-  // Intervalo em milissegundos para enviar dados e verificar comandos
+  BASE_URL: 'http://localhost:3000', 
   INTERVAL: 10000, // 10 segundos
 };
 
-// --- FUNÇÕES DE SIMULAÇÃO ---
+let mockDeviceState = {
+  lonaFechada: false, 
+  bombaLigada: false,
+};
 
 /**
- * Gera dados de sensores aleatórios dentro de uma faixa.
+ * Gera dados de sensores aleatórios, refletindo a realidade do hardware.
  */
 function generateFakeSensorData() {
+  const estaChovendo = Math.random() < 0.1;
+
+  const umidade_solo = Math.floor(Math.random() * (3000 - 500) + 500); // Faixa de 500 a 3000
+
+  let status_solo;
+  if (umidade_solo > 1800) status_solo = 0; // seco
+  else if (umidade_solo >= 1000) status_solo = 1; // úmido
+  else status_solo = 2; // encharcado
+
+  if (!mockDeviceState.bombaLigada) {
+    mockDeviceState.bombaLigada = status_solo === 0; // Liga a bomba se o solo estiver seco
+  }
+  
+  mockDeviceState.lonaFechada = estaChovendo;
+
   const data = {
-    temperature: parseFloat((Math.random() * (35 - 15) + 15).toFixed(2)), // entre 15 e 35 °C
-    humidity: parseFloat((Math.random() * (80 - 30) + 30).toFixed(2)),    // entre 30% e 80%
-    luminosity: parseFloat((Math.random() * (1000 - 200) + 200).toFixed(2)),// entre 200 e 1000 lux
+    umidade: umidade_solo,
+    chuva: estaChovendo ? 0 : 1, // 0 para chuva, 1 para sem chuva
+    status_bomba: mockDeviceState.bombaLigada ? 1 : 0,
+    status_lona: mockDeviceState.lonaFechada ? 0 : 1, // 0 fechada, 1 aberta
+    status_solo: status_solo,
+    status_wifi: Math.floor(Math.random() * (-40 - -80) + -80), // Sinal entre -80 e -40 dBi
+    nivel_agua: parseFloat((Math.random() * 21).toFixed(2)), // Nível entre 0 e 21 cm
   };
-  console.log(`[DADOS GERADOS] Temp: ${data.temperature}°C, Umid: ${data.humidity}%, Luz: ${data.luminosity} lux`);
+
+  console.log(`[DADOS GERADOS]`, data);
   return data;
 }
 
@@ -29,11 +50,11 @@ function generateFakeSensorData() {
  * Envia os dados dos sensores para a API.
  */
 async function sendSensorData() {
-  if (CONFIG.API_KEY !== API_KEY) return; 
+  if (!CONFIG.API_KEY) return; 
 
   try {
     const data = generateFakeSensorData();
-    await axios.post(`${CONFIG.BASE_URL}/device/sensor-readings`, data, {
+    await axios.post(`${CONFIG.BASE_URL}/api/device/sensor-readings`, data, {
       headers: {
         'x-api-key': CONFIG.API_KEY,
         'Content-Type': 'application/json',
@@ -46,20 +67,33 @@ async function sendSensorData() {
 }
 
 /**
- * Busca por comandos pendentes na API.
+ * Busca por comandos pendentes e ATUALIZA O ESTADO INTERNO DO MOCK.
  */
 async function fetchCommands() {
-  if (CONFIG.API_KEY !== API_KEY) return; 
+  if (!CONFIG.API_KEY) return; 
   
   try {
-    const response = await axios.get(`${CONFIG.BASE_URL}/device/commands`, {
+    const response = await axios.get(`${CONFIG.BASE_URL}/api/device/commands`, {
       headers: { 'x-api-key': CONFIG.API_KEY },
     });
     
     const command = response.data.command;
     if (command) {
       console.log('✅ [COMANDO] Comando recebido:', command);
-      // Aqui, o ESP32 real iria executar a ação (ex: acionar a bomba)
+      
+      if (command.action === 'TOGGLE_COVER') {
+        mockDeviceState.lonaFechada = !mockDeviceState.lonaFechada;
+        console.log(`[MOCK STATE] Estado da lona alterado para: ${mockDeviceState.lonaFechada ? 'FECHADA' : 'ABERTA'}`);
+      }
+      if (command.action === 'WATER_PUMP') {
+        console.log('[MOCK STATE] Bomba ligada manualmente por 5 segundos...');
+        mockDeviceState.bombaLigada = true;
+        setTimeout(() => {
+          mockDeviceState.bombaLigada = false;
+          console.log('[MOCK STATE] Bomba desligada após o tempo.');
+        }, 5000);
+      }
+
     } else {
       console.log('... [COMANDO] Nenhum comando pendente.');
     }
@@ -69,16 +103,14 @@ async function fetchCommands() {
 }
 
 // --- EXECUÇÃO PRINCIPAL ---
-
 function main() {
-  console.log('--- Mock do Dispositivo ESP32 Iniciado ---');
-  if (CONFIG.API_KEY !== API_KEY) {
-    console.warn('AVISO: A API Key não foi configurada. O script não fará nada.');
-    console.warn('Por favor, edite o arquivo esp32-mock.js com a chave gerada ao cadastrar uma planta.');
+  console.log('--- Mock do Dispositivo ESP32 (Refatorado) Iniciado ---');
+  if (!CONFIG.API_KEY || CONFIG.API_KEY === 'COLE_AQUI_SUA_API_KEY') {
+    console.warn('AVISO: A API Key não foi configurada no arquivo esp32-mock.js.');
     return;
   }
   
-  console.log(`Enviando dados a cada ${CONFIG.INTERVAL / 1000} segundos...`);
+  console.log(`Enviando dados e buscando comandos a cada ${CONFIG.INTERVAL / 1000} segundos...`);
   
   sendSensorData();
   fetchCommands();
