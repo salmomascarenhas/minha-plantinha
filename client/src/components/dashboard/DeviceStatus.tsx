@@ -8,6 +8,7 @@ import {
   Text,
   ThemeIcon,
   Title,
+  Tooltip,
   Transition,
   useMantineColorScheme,
   useMantineTheme,
@@ -100,6 +101,69 @@ const getWaterStatus = (percentage: number) => {
   };
 };
 
+const getOptimizedColors = (
+  colorScheme: string,
+  theme: ReturnType<typeof useMantineTheme>,
+  isDark: boolean
+) => {
+  switch (colorScheme) {
+    case "myDanger":
+      return {
+        primary: isDark ? theme.colors.red[3] : theme.colors.red[7],
+        light: isDark ? theme.colors.red[6] : theme.colors.red[3],
+        bg: isDark ? theme.colors.red[9] : theme.colors.red[0],
+        text: isDark ? theme.colors.red[2] : theme.colors.red[8],
+        border: isDark ? theme.colors.red[4] : theme.colors.red[6],
+        badgeText: isDark ? theme.white : theme.colors.red[0],
+      };
+    case "myGreen":
+      return {
+        primary: isDark ? theme.colors.green[3] : theme.colors.green[7],
+        light: isDark ? theme.colors.green[6] : theme.colors.green[3],
+        bg: isDark ? theme.colors.green[9] : theme.colors.green[0],
+        text: isDark ? theme.colors.green[2] : theme.colors.green[8],
+        border: isDark ? theme.colors.green[4] : theme.colors.green[6],
+        badgeText: isDark ? theme.white : theme.colors.green[0],
+      };
+    case "cyan":
+      return {
+        primary: isDark ? theme.colors.cyan[3] : theme.colors.cyan[7],
+        light: isDark ? theme.colors.cyan[6] : theme.colors.cyan[3],
+        bg: isDark ? theme.colors.cyan[9] : theme.colors.cyan[0],
+        text: isDark ? theme.colors.cyan[2] : theme.colors.cyan[8],
+        border: isDark ? theme.colors.cyan[4] : theme.colors.cyan[6],
+        badgeText: isDark ? theme.white : theme.colors.cyan[0],
+      };
+    case "yellow":
+      return {
+        primary: isDark ? theme.colors.yellow[3] : theme.colors.yellow[8],
+        light: isDark ? theme.colors.yellow[6] : theme.colors.yellow[2],
+        bg: isDark ? theme.colors.yellow[9] : theme.colors.yellow[0],
+        text: isDark ? theme.colors.yellow[2] : theme.colors.yellow[9],
+        border: isDark ? theme.colors.yellow[4] : theme.colors.yellow[7],
+        badgeText: isDark ? theme.colors.gray[9] : theme.colors.yellow[0],
+      };
+    case "orange":
+      return {
+        primary: isDark ? theme.colors.orange[3] : theme.colors.orange[7],
+        light: isDark ? theme.colors.orange[6] : theme.colors.orange[3],
+        bg: isDark ? theme.colors.orange[9] : theme.colors.orange[0],
+        text: isDark ? theme.colors.orange[2] : theme.colors.orange[8],
+        border: isDark ? theme.colors.orange[4] : theme.colors.orange[6],
+        badgeText: isDark ? theme.white : theme.colors.orange[0],
+      };
+    default:
+      return {
+        primary: isDark ? theme.colors.gray[4] : theme.colors.gray[7],
+        light: isDark ? theme.colors.gray[7] : theme.colors.gray[3],
+        bg: isDark ? theme.colors.gray[8] : theme.colors.gray[0],
+        text: isDark ? theme.colors.gray[3] : theme.colors.gray[8],
+        border: isDark ? theme.colors.gray[5] : theme.colors.gray[6],
+        badgeText: isDark ? theme.white : theme.colors.gray[0],
+      };
+  }
+};
+
 export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -115,27 +179,37 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
 
   const water = getWaterStatus(waterPercentage);
 
+  const wifiColors = getOptimizedColors(wifi.colorScheme, theme, isDark);
+  const waterColors = getOptimizedColors(water.colorScheme, theme, isDark);
+
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   return (
     <>
-      {/* Animações CSS */}
+      {/* Animações CSS melhoradas */}
       <style>
         {`
           @keyframes devicePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.95; }
           }
           @keyframes signalFlow {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
           }
           @keyframes waterFlow {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
-            100% { transform: translateY(0); }
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-3px) scale(1.02); }
+            100% { transform: translateY(0) scale(1); }
+          }
+          .device-container {
+            transition: all 0.3s ease;
+            cursor: pointer;
+          }
+          .device-container:hover {
+            transform: scale(1.01);
           }
         `}
       </style>
@@ -143,21 +217,22 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
       <Transition mounted={isVisible} transition="slide-up" duration={500}>
         {(styles) => (
           <Paper
+            className="device-container"
             p="xl"
             radius="xl"
             style={{
               ...styles,
               background: isDark
                 ? `linear-gradient(135deg, ${theme.colors.dark[7]} 0%, ${theme.colors.dark[6]} 100%)`
-                : `linear-gradient(135deg, ${theme.colors.gray[0]} 0%, ${theme.colors.blue[0]} 100%)`,
+                : `linear-gradient(135deg, ${theme.white} 0%, ${theme.colors.gray[0]} 100%)`,
               border: `2px solid ${
-                isDark ? theme.colors.dark[4] : theme.colors.gray[2]
+                isDark ? theme.colors.dark[4] : theme.colors.gray[3]
               }`,
               position: "relative",
               overflow: "hidden",
               boxShadow: isDark
                 ? `0 8px 32px ${theme.colors.dark[9]}50`
-                : `0 8px 32px ${theme.colors.gray[3]}30`,
+                : `0 8px 32px ${theme.colors.gray[4]}20`,
             }}
           >
             {/* Efeito de fundo decorativo */}
@@ -193,18 +268,51 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                     <Title order={4} c={isDark ? "blue.4" : "blue.8"}>
                       📡 Status do Dispositivo
                     </Title>
-                    <Text size="sm" c="dimmed">
+                    <Text size="sm" c={isDark ? "dimmed" : "gray.7"}>
                       ESP32 Smart Plant Monitor
                     </Text>
                   </Box>
                 </Group>
 
                 <Badge
-                  variant="dot"
-                  color={wifi.status === "disconnected" ? "gray" : "myGreen"}
+                  variant="light"
                   size="lg"
+                  style={{
+                    background:
+                      wifi.status === "disconnected"
+                        ? isDark
+                          ? `${theme.colors.gray[8]}90`
+                          : `${theme.colors.gray[1]}90`
+                        : isDark
+                        ? `${theme.colors.green[9]}90`
+                        : `${theme.colors.green[0]}90`,
+                    color:
+                      wifi.status === "disconnected"
+                        ? isDark
+                          ? theme.colors.gray[3]
+                          : theme.colors.gray[7]
+                        : isDark
+                        ? theme.colors.green[2]
+                        : theme.colors.green[8],
+                    fontWeight: 600,
+                    backdropFilter: "blur(10px)",
+                    border: `1px solid ${
+                      wifi.status === "disconnected"
+                        ? isDark
+                          ? theme.colors.gray[6]
+                          : theme.colors.gray[3]
+                        : isDark
+                        ? theme.colors.green[6]
+                        : theme.colors.green[3]
+                    }`,
+                    boxShadow: `0 2px 8px ${
+                      wifi.status === "disconnected"
+                        ? theme.colors.gray[5]
+                        : theme.colors.green[5]
+                    }20`,
+                  }}
                 >
-                  {wifi.status === "disconnected" ? "Offline" : "Online"}
+                  {wifi.status === "disconnected" ? "📴 Offline" : "🟢 Online"}
                 </Badge>
               </Group>
 
@@ -215,20 +323,12 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                   style={{
                     background: isDark
                       ? `${theme.colors.dark[6]}80`
-                      : `${theme.white}70`,
+                      : `${theme.white}`,
                     padding: theme.spacing.md,
                     borderRadius: theme.radius.lg,
-                    border: `1px solid ${
-                      theme.colors[
-                        wifi.colorScheme as keyof typeof theme.colors
-                      ]?.[2] || theme.colors.gray[2]
-                    }`,
+                    border: `1px solid ${wifiColors.border}`,
                     backdropFilter: "blur(10px)",
-                    boxShadow: `0 4px 16px ${
-                      theme.colors[
-                        wifi.colorScheme as keyof typeof theme.colors
-                      ]?.[2] || theme.colors.gray[2]
-                    }20`,
+                    boxShadow: `0 4px 16px ${wifiColors.primary}20`,
                   }}
                 >
                   <Group gap="md" align="center">
@@ -247,21 +347,48 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                     </ThemeIcon>
                     <Box style={{ flex: 1 }}>
                       <Group justify="space-between" align="center">
-                        <Text size="sm" c="dimmed" fw={500}>
+                        <Text
+                          size="sm"
+                          c={isDark ? "dimmed" : "gray.7"}
+                          fw={500}
+                        >
                           📶 Sinal Wi-Fi
                         </Text>
                         <Badge
                           variant="light"
-                          color={wifi.colorScheme}
                           size="sm"
+                          style={{
+                            background: wifiColors.bg,
+                            color: wifiColors.text,
+                            fontWeight: 600,
+                            border: `1px solid ${wifiColors.border}`,
+                          }}
                         >
                           {wifi.label}
                         </Badge>
                       </Group>
-                      <Text fw={600} size="md" c={isDark ? "gray.1" : "dark.8"}>
-                        {wifi.description}
-                      </Text>
-                      <Text size="xs" c="dimmed" mt={2}>
+                      <Tooltip
+                        label={
+                          wifi.description.length > 20 ? wifi.description : null
+                        }
+                        disabled={wifi.description.length <= 20}
+                      >
+                        <Text
+                          fw={600}
+                          size="md"
+                          c={isDark ? "gray.1" : "gray.9"}
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            cursor:
+                              wifi.description.length > 20 ? "help" : "default",
+                          }}
+                        >
+                          {wifi.description}
+                        </Text>
+                      </Tooltip>
+                      <Text size="xs" c={isDark ? "dimmed" : "gray.9"} mt={2}>
                         {wifiSignal ?? "--"} dBm
                       </Text>
                     </Box>
@@ -273,20 +400,12 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                   style={{
                     background: isDark
                       ? `${theme.colors.dark[6]}80`
-                      : `${theme.white}70`,
+                      : `${theme.white}`,
                     padding: theme.spacing.md,
                     borderRadius: theme.radius.lg,
-                    border: `1px solid ${
-                      theme.colors[
-                        water.colorScheme as keyof typeof theme.colors
-                      ]?.[2] || theme.colors.blue[2]
-                    }`,
+                    border: `1px solid ${waterColors.border}`,
                     backdropFilter: "blur(10px)",
-                    boxShadow: `0 4px 16px ${
-                      theme.colors[
-                        water.colorScheme as keyof typeof theme.colors
-                      ]?.[2] || theme.colors.blue[2]
-                    }20`,
+                    boxShadow: `0 4px 16px ${waterColors.primary}20`,
                   }}
                 >
                   <Group gap="md" align="center">
@@ -305,21 +424,52 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                     </ThemeIcon>
                     <Box style={{ flex: 1 }}>
                       <Group justify="space-between" align="center">
-                        <Text size="sm" c="dimmed" fw={500}>
+                        <Text
+                          size="sm"
+                          c={isDark ? "dimmed" : "gray.7"}
+                          fw={500}
+                        >
                           💧 Nível do Reservatório
                         </Text>
                         <Badge
                           variant="light"
-                          color={water.colorScheme}
                           size="sm"
+                          style={{
+                            background: waterColors.bg,
+                            color: waterColors.text,
+                            fontWeight: 600,
+                            border: `1px solid ${waterColors.border}`,
+                          }}
                         >
                           {water.label}
                         </Badge>
                       </Group>
-                      <Text fw={600} size="md" c={isDark ? "gray.1" : "dark.8"}>
-                        {water.description}
-                      </Text>
-                      <Text size="xs" c="dimmed" mt={2}>
+                      <Tooltip
+                        label={
+                          water.description.length > 20
+                            ? water.description
+                            : null
+                        }
+                        disabled={water.description.length <= 20}
+                      >
+                        <Text
+                          fw={600}
+                          size="md"
+                          c={isDark ? "gray.1" : "gray.9"}
+                          style={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            cursor:
+                              water.description.length > 20
+                                ? "help"
+                                : "default",
+                          }}
+                        >
+                          {water.description}
+                        </Text>
+                      </Tooltip>
+                      <Text size="xs" c={isDark ? "dimmed" : "gray.9"} mt={2}>
                         {waterPercentage.toFixed(0)}% capacidade
                       </Text>
                     </Box>
@@ -341,6 +491,11 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                       boxShadow: `inset 0 2px 4px ${
                         isDark ? theme.colors.dark[9] : theme.colors.gray[3]
                       }20`,
+                    }}
+                    styles={{
+                      section: {
+                        background: `linear-gradient(90deg, ${waterColors.primary} 0%, ${waterColors.border} 100%)`,
+                      },
                     }}
                   />
                 </Box>
