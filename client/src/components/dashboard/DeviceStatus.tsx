@@ -14,19 +14,44 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import {
+  IconCloudRain,
   IconDeviceDesktop,
   IconDropletFilled,
+  IconEngine,
+  IconPlant2,
   IconSignal2g,
   IconSignal3g,
   IconSignal4g,
   IconSignal5g,
+  IconSunOff,
   IconWifiOff,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
+interface StatusInfo {
+  colorScheme: string;
+  label: string;
+  icon?: React.ReactNode;
+  status: string;
+  description: string;
+}
+
+interface ColorInfo {
+  primary: string;
+  light: string;
+  bg: string;
+  text: string;
+  border: string;
+  badgeText: string;
+}
+
 interface DeviceStatusProps {
   wifiSignal?: number;
   waterLevel?: number;
+  rainDetected?: boolean;
+  pumpStatus?: boolean;
+  coverStatus?: boolean;
+  soilStatus?: number; // 0: seco, 1: úmido, 2: encharcado
 }
 
 const getWifiStatus = (dbi?: number) => {
@@ -101,6 +126,118 @@ const getWaterStatus = (percentage: number) => {
   };
 };
 
+const getSoilStatus = (status?: number) => {
+  if (typeof status === "undefined")
+    return {
+      colorScheme: "gray",
+      label: "Desconhecido",
+      icon: <IconPlant2 size={20} />,
+      status: "unknown",
+      description: "Status não disponível",
+    };
+  if (status === 0)
+    return {
+      colorScheme: "yellow",
+      label: "Seco",
+      icon: <IconSunOff size={20} />,
+      status: "dry",
+      description: "Solo necessita irrigação",
+    };
+  if (status === 1)
+    return {
+      colorScheme: "myGreen",
+      label: "Úmido",
+      icon: <IconPlant2 size={20} />,
+      status: "moist",
+      description: "Solo em condições ideais",
+    };
+  return {
+    colorScheme: "blue",
+    label: "Encharcado",
+    icon: <IconDropletFilled size={20} />,
+    status: "soaked",
+    description: "Solo com excesso de água",
+  };
+};
+
+const getRainStatus = (detected?: boolean) => {
+  if (typeof detected === "undefined")
+    return {
+      colorScheme: "gray",
+      label: "Desconhecido",
+      icon: <IconCloudRain size={20} />,
+      status: "unknown",
+      description: "Sensor não disponível",
+    };
+  return detected
+    ? {
+        colorScheme: "blue",
+        label: "Detectada",
+        icon: <IconCloudRain size={20} />,
+        status: "detected",
+        description: "Chuva em andamento",
+      }
+    : {
+        colorScheme: "gray",
+        label: "Sem Chuva",
+        icon: <IconCloudRain size={20} />,
+        status: "clear",
+        description: "Tempo seco",
+      };
+};
+
+const getPumpStatus = (active?: boolean) => {
+  if (typeof active === "undefined")
+    return {
+      colorScheme: "gray",
+      label: "Desconhecido",
+      icon: <IconEngine size={20} />,
+      status: "unknown",
+      description: "Status não disponível",
+    };
+  return active
+    ? {
+        colorScheme: "myGreen",
+        label: "Ativa",
+        icon: <IconEngine size={20} />,
+        status: "active",
+        description: "Bomba funcionando",
+      }
+    : {
+        colorScheme: "gray",
+        label: "Inativa",
+        icon: <IconEngine size={20} />,
+        status: "inactive",
+        description: "Bomba parada",
+      };
+};
+
+const getCoverStatus = (open?: boolean) => {
+  if (typeof open === "undefined")
+    return {
+      colorScheme: "gray",
+      label: "Desconhecido",
+      icon: <IconSunOff size={20} />,
+      status: "unknown",
+      description: "Status não disponível",
+    };
+  return open
+    ? {
+        colorScheme: "myGreen",
+        label: "Aberta",
+        icon: <IconSunOff size={20} />,
+        status: "open",
+        description: "Cobertura retraída",
+      }
+    : {
+        colorScheme: "blue",
+        label: "Fechada",
+        icon: <IconSunOff size={20} />,
+        status: "closed",
+        description: "Cobertura ativa",
+      };
+};
+
 const getOptimizedColors = (
   colorScheme: string,
   theme: ReturnType<typeof useMantineTheme>,
@@ -164,7 +301,14 @@ const getOptimizedColors = (
   }
 };
 
-export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
+export function DeviceStatus({
+  wifiSignal,
+  waterLevel,
+  rainDetected,
+  pumpStatus,
+  coverStatus,
+  soilStatus,
+}: DeviceStatusProps) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
   const [isVisible, setIsVisible] = useState(false);
@@ -178,23 +322,106 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
       : 0;
 
   const water = getWaterStatus(waterPercentage);
+  const soil = getSoilStatus(soilStatus);
+  const rain = getRainStatus(rainDetected);
+  const pump = getPumpStatus(pumpStatus);
+  const cover = getCoverStatus(coverStatus);
 
   const wifiColors = getOptimizedColors(wifi.colorScheme, theme, isDark);
   const waterColors = getOptimizedColors(water.colorScheme, theme, isDark);
+  const soilColors = getOptimizedColors(soil.colorScheme, theme, isDark);
+  const rainColors = getOptimizedColors(rain.colorScheme, theme, isDark);
+  const pumpColors = getOptimizedColors(pump.colorScheme, theme, isDark);
+  const coverColors = getOptimizedColors(cover.colorScheme, theme, isDark);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
+  const StatusCard = ({
+    title,
+    status,
+    colors,
+    extra,
+  }: {
+    title: string;
+    status: StatusInfo;
+    colors: ColorInfo;
+    extra?: React.ReactNode;
+  }) => (
+    <Box
+      style={{
+        background: isDark ? `${theme.colors.dark[6]}80` : theme.white,
+        padding: theme.spacing.md,
+        borderRadius: theme.radius.lg,
+        border: `1px solid ${colors.border}`,
+        backdropFilter: "blur(10px)",
+        boxShadow: `0 2px 8px ${colors.primary}10`,
+      }}
+    >
+      <Group justify="space-between" align="center">
+        <ThemeIcon
+          size={40}
+          radius="md"
+          style={{
+            background: colors.bg,
+            color: colors.primary,
+            border: `1px solid ${colors.border}`,
+            animation:
+              status.status !== "unknown" && status.status !== "disconnected"
+                ? "signalFlow 2s ease-in-out infinite"
+                : "none",
+          }}
+        >
+          {status.icon}
+        </ThemeIcon>
+        <Box style={{ flex: 1 }}>
+          <Group justify="space-between" align="center">
+            <Text size="sm" c={isDark ? "dimmed" : "gray.7"} fw={500}>
+              {title}
+            </Text>
+            <Badge
+              variant="light"
+              size="sm"
+              style={{
+                background: colors.bg,
+                color: colors.text,
+                fontWeight: 600,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              {status.label}
+            </Badge>
+          </Group>
+          <Tooltip
+            label={status.description.length > 20 ? status.description : null}
+            disabled={status.description.length <= 20}
+          >
+            <Text
+              fw={600}
+              size="md"
+              c={isDark ? "gray.1" : "gray.9"}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                cursor: status.description.length > 20 ? "help" : "default",
+              }}
+            >
+              {status.description}
+            </Text>
+          </Tooltip>
+          {extra}
+        </Box>
+      </Group>
+    </Box>
+  );
+
   return (
     <>
-      {/* Animações CSS melhoradas */}
+      {/* Animações CSS */}
       <style>
         {`
-          @keyframes devicePulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.02); opacity: 0.95; }
-          }
           @keyframes signalFlow {
             0%, 100% { opacity: 0.6; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.05); }
@@ -204,12 +431,9 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
             50% { transform: translateY(-3px) scale(1.02); }
             100% { transform: translateY(0) scale(1); }
           }
-          .device-container {
-            transition: all 0.3s ease;
-            cursor: pointer;
-          }
-          .device-container:hover {
-            transform: scale(1.01);
+          @keyframes devicePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.95; }
           }
         `}
       </style>
@@ -217,7 +441,6 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
       <Transition mounted={isVisible} transition="slide-up" duration={500}>
         {(styles) => (
           <Paper
-            className="device-container"
             p="xl"
             radius="xl"
             style={{
@@ -228,55 +451,39 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
               border: `2px solid ${
                 isDark ? theme.colors.dark[4] : theme.colors.gray[3]
               }`,
-              position: "relative",
-              overflow: "hidden",
               boxShadow: isDark
-                ? `0 8px 32px ${theme.colors.dark[9]}50`
+                ? `0 8px 32px ${theme.colors.dark[9]}40`
                 : `0 8px 32px ${theme.colors.gray[4]}20`,
+              transition: "all 0.3s ease",
             }}
           >
-            {/* Efeito de fundo decorativo */}
-            <Box
-              style={{
-                position: "absolute",
-                top: -40,
-                right: -40,
-                width: 100,
-                height: 100,
-                background: isDark
-                  ? `linear-gradient(45deg, ${theme.colors.dark[5]}40, ${theme.colors.blue[8]}20)`
-                  : `linear-gradient(45deg, ${theme.colors.blue[2]}20, ${theme.colors.gray[2]}20)`,
-                borderRadius: "50%",
-                opacity: 0.7,
-                animation: "devicePulse 6s ease-in-out infinite",
-              }}
-            />
-
             <Stack gap="lg">
               {/* Header */}
               <Group justify="space-between" align="center">
-                <Group gap="md">
+                <Group gap="sm">
                   <ThemeIcon
-                    size="xl"
+                    size={48}
                     radius="xl"
-                    variant="gradient"
-                    gradient={{ from: "blue", to: "cyan", deg: 45 }}
+                    style={{
+                      background: `linear-gradient(135deg, ${theme.colors.green[6]} 0%, ${theme.colors.green[4]} 100%)`,
+                      boxShadow: `0 4px 16px ${theme.colors.green[5]}30`,
+                      animation: "devicePulse 3s ease-in-out infinite",
+                    }}
                   >
-                    <IconDeviceDesktop size={24} />
+                    <IconDeviceDesktop size={24} color={theme.white} />
                   </ThemeIcon>
                   <Box>
-                    <Title order={4} c={isDark ? "blue.4" : "blue.8"}>
-                      📡 Status do Dispositivo
+                    <Title order={4} c={isDark ? "gray.1" : "gray.9"}>
+                      Status do Dispositivo
                     </Title>
-                    <Text size="sm" c={isDark ? "dimmed" : "gray.7"}>
-                      ESP32 Smart Plant Monitor
+                    <Text size="sm" c="dimmed">
+                      Sensores e atuadores
                     </Text>
                   </Box>
                 </Group>
-
                 <Badge
-                  variant="light"
                   size="lg"
+                  radius="md"
                   style={{
                     background:
                       wifi.status === "disconnected"
@@ -305,200 +512,78 @@ export function DeviceStatus({ wifiSignal, waterLevel }: DeviceStatusProps) {
                         ? theme.colors.green[6]
                         : theme.colors.green[3]
                     }`,
-                    boxShadow: `0 2px 8px ${
-                      wifi.status === "disconnected"
-                        ? theme.colors.gray[5]
-                        : theme.colors.green[5]
-                    }20`,
                   }}
                 >
                   {wifi.status === "disconnected" ? "📴 Offline" : "🟢 Online"}
                 </Badge>
               </Group>
 
-              {/* Status Cards */}
+              {/* Status Cards Grid */}
               <Stack gap="md">
-                {/* Wi-Fi Status Card */}
-                <Box
-                  style={{
-                    background: isDark
-                      ? `${theme.colors.dark[6]}80`
-                      : `${theme.white}`,
-                    padding: theme.spacing.md,
-                    borderRadius: theme.radius.lg,
-                    border: `1px solid ${wifiColors.border}`,
-                    backdropFilter: "blur(10px)",
-                    boxShadow: `0 4px 16px ${wifiColors.primary}20`,
-                  }}
-                >
-                  <Group gap="md" align="center">
-                    <ThemeIcon
-                      color={wifi.colorScheme}
-                      variant="light"
-                      size="lg"
-                      style={{
-                        animation:
-                          wifi.status !== "disconnected"
-                            ? "signalFlow 2s ease-in-out infinite"
-                            : "none",
-                      }}
-                    >
-                      {wifi.icon}
-                    </ThemeIcon>
-                    <Box style={{ flex: 1 }}>
-                      <Group justify="space-between" align="center">
-                        <Text
-                          size="sm"
-                          c={isDark ? "dimmed" : "gray.7"}
-                          fw={500}
-                        >
-                          📶 Sinal Wi-Fi
-                        </Text>
-                        <Badge
-                          variant="light"
-                          size="sm"
-                          style={{
-                            background: wifiColors.bg,
-                            color: wifiColors.text,
-                            fontWeight: 600,
-                            border: `1px solid ${wifiColors.border}`,
-                          }}
-                        >
-                          {wifi.label}
-                        </Badge>
-                      </Group>
-                      <Tooltip
-                        label={
-                          wifi.description.length > 20 ? wifi.description : null
-                        }
-                        disabled={wifi.description.length <= 20}
-                      >
-                        <Text
-                          fw={600}
-                          size="md"
-                          c={isDark ? "gray.1" : "gray.9"}
-                          style={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            cursor:
-                              wifi.description.length > 20 ? "help" : "default",
-                          }}
-                        >
-                          {wifi.description}
-                        </Text>
-                      </Tooltip>
-                      <Text size="xs" c={isDark ? "dimmed" : "gray.9"} mt={2}>
-                        {wifiSignal ?? "--"} dBm
+                <StatusCard
+                  title="📶 Sinal Wi-Fi"
+                  status={wifi}
+                  colors={wifiColors}
+                  extra={
+                    typeof wifiSignal === "number" && (
+                      <Text size="xs" c="dimmed" mt={2}>
+                        {wifiSignal} dBm
                       </Text>
-                    </Box>
-                  </Group>
-                </Box>
+                    )
+                  }
+                />
 
-                {/* Water Level Status Card */}
-                <Box
-                  style={{
-                    background: isDark
-                      ? `${theme.colors.dark[6]}80`
-                      : `${theme.white}`,
-                    padding: theme.spacing.md,
-                    borderRadius: theme.radius.lg,
-                    border: `1px solid ${waterColors.border}`,
-                    backdropFilter: "blur(10px)",
-                    boxShadow: `0 4px 16px ${waterColors.primary}20`,
-                  }}
-                >
-                  <Group gap="md" align="center">
-                    <ThemeIcon
-                      color={water.colorScheme}
-                      variant="light"
-                      size="lg"
-                      style={{
-                        animation:
-                          waterPercentage > 0
-                            ? "waterFlow 3s ease-in-out infinite"
-                            : "none",
-                      }}
-                    >
-                      <IconDropletFilled size={24} />
-                    </ThemeIcon>
-                    <Box style={{ flex: 1 }}>
-                      <Group justify="space-between" align="center">
-                        <Text
-                          size="sm"
-                          c={isDark ? "dimmed" : "gray.7"}
-                          fw={500}
-                        >
-                          💧 Nível do Reservatório
-                        </Text>
-                        <Badge
-                          variant="light"
-                          size="sm"
-                          style={{
-                            background: waterColors.bg,
-                            color: waterColors.text,
-                            fontWeight: 600,
-                            border: `1px solid ${waterColors.border}`,
-                          }}
-                        >
-                          {water.label}
-                        </Badge>
-                      </Group>
-                      <Tooltip
-                        label={
-                          water.description.length > 20
-                            ? water.description
-                            : null
-                        }
-                        disabled={water.description.length <= 20}
-                      >
-                        <Text
-                          fw={600}
-                          size="md"
-                          c={isDark ? "gray.1" : "gray.9"}
-                          style={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            cursor:
-                              water.description.length > 20
-                                ? "help"
-                                : "default",
-                          }}
-                        >
-                          {water.description}
-                        </Text>
-                      </Tooltip>
-                      <Text size="xs" c={isDark ? "dimmed" : "gray.9"} mt={2}>
+                <StatusCard
+                  title="💧 Nível do Reservatório"
+                  status={water}
+                  colors={waterColors}
+                  extra={
+                    <>
+                      <Text size="xs" c="dimmed" mt={2}>
                         {waterPercentage.toFixed(0)}% capacidade
                       </Text>
-                    </Box>
-                  </Group>
+                      <Progress
+                        value={waterPercentage}
+                        size="lg"
+                        radius="md"
+                        mt="sm"
+                        style={{
+                          "& .mantineProgressBar": {
+                            background: `linear-gradient(90deg, ${waterColors.primary}, ${waterColors.primary})`,
+                            animation:
+                              waterPercentage > 0
+                                ? "waterFlow 2s ease-in-out infinite"
+                                : "none",
+                          },
+                        }}
+                      />
+                    </>
+                  }
+                />
 
-                  {/* Barra de progresso melhorada */}
-                  <Progress
-                    value={waterPercentage}
-                    size="lg"
-                    radius="xl"
-                    color={water.colorScheme}
-                    animated={waterPercentage > 0}
-                    striped={water.status === "critical"}
-                    mt="md"
-                    style={{
-                      background: isDark
-                        ? `${theme.colors.dark[5]}60`
-                        : `${theme.colors.gray[1]}60`,
-                      boxShadow: `inset 0 2px 4px ${
-                        isDark ? theme.colors.dark[9] : theme.colors.gray[3]
-                      }20`,
-                    }}
-                    styles={{
-                      section: {
-                        background: `linear-gradient(90deg, ${waterColors.primary} 0%, ${waterColors.border} 100%)`,
-                      },
-                    }}
-                  />
-                </Box>
+                <StatusCard
+                  title="🌱 Status do Solo"
+                  status={soil}
+                  colors={soilColors}
+                />
+
+                <StatusCard
+                  title="🌧️ Detecção de Chuva"
+                  status={rain}
+                  colors={rainColors}
+                />
+
+                <StatusCard
+                  title="⚙️ Bomba d'Água"
+                  status={pump}
+                  colors={pumpColors}
+                />
+
+                <StatusCard
+                  title="☂️ Cobertura"
+                  status={cover}
+                  colors={coverColors}
+                />
               </Stack>
             </Stack>
           </Paper>

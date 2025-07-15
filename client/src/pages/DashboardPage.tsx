@@ -109,11 +109,11 @@ export function DashboardPage() {
         (() => {
           const { plant } = plantData;
           const latestReading = plant.SensorData?.[0];
-
           return (
             <Stack gap="xl">
               <Title order={1}>Painel de Controle: {plant.name}</Title>
 
+              {/* Gamification Status */}
               {isLoadingGamification ? (
                 <Paper p="lg" radius="md" withBorder>
                   <Loader size="sm" />
@@ -122,8 +122,62 @@ export function DashboardPage() {
                 gamificationData && <GamificationStatus {...gamificationData} />
               )}
 
+              {/* Layout Responsivo Melhorado */}
               <Grid>
-                <Grid.Col span={{ base: 12, md: 8 }}>
+                {/* Coluna Principal - Sensores e Status (Prioridade Mobile) */}
+                <Grid.Col span={{ base: 12, md: 8 }} order={{ base: 1, md: 2 }}>
+                  <Stack>
+                    {/* Sensores Principais */}
+                    <Grid>
+                      {typeof latestReading?.humidity === "number" && (
+                        <Grid.Col span={{ base: 6, sm: 4 }}>
+                          <SensorCard
+                            title="Umidade Solo"
+                            value={latestReading.humidity}
+                            unit="%"
+                            icon={<IconDroplet />}
+                            color="blue"
+                          />
+                        </Grid.Col>
+                      )}
+                      {typeof latestReading?.temperature === "number" && (
+                        <Grid.Col span={{ base: 6, sm: 4 }}>
+                          <SensorCard
+                            title="Temperatura"
+                            value={latestReading.temperature}
+                            unit="°C"
+                            icon={<IconTemperature />}
+                            color="orange"
+                          />
+                        </Grid.Col>
+                      )}
+                      {typeof latestReading?.luminosity === "number" && (
+                        <Grid.Col span={{ base: 6, sm: 4 }}>
+                          <SensorCard
+                            title="Luminosidade"
+                            value={latestReading.luminosity}
+                            unit="lux"
+                            icon={<IconSun />}
+                            color="yellow"
+                          />
+                        </Grid.Col>
+                      )}
+                    </Grid>
+                    <DeviceStatus
+                      wifiSignal={latestReading?.wifiSignal}
+                      waterLevel={latestReading?.waterLevel}
+                      rainDetected={latestReading?.rainDetected}
+                      pumpStatus={latestReading?.pumpStatus}
+                      coverStatus={latestReading?.coverStatus}
+                      soilStatus={latestReading?.soilStatus}
+                    />
+
+                    <HistoryChart plantId={plant.id} />
+                  </Stack>
+                </Grid.Col>
+
+                {/* Coluna Secundária - Mascote e IA (Mobile fica abaixo) */}
+                <Grid.Col span={{ base: 12, md: 4 }} order={{ base: 2, md: 1 }}>
                   <Stack>
                     <MascotDisplay
                       soilStatus={latestReading?.soilStatus}
@@ -132,46 +186,8 @@ export function DashboardPage() {
                       xp={currentLevelXp}
                       maxXp={100}
                     />
-                    <AiAssistant plantId={plant.id} plantName={plant.name} />
-                    <HistoryChart plantId={plant.id} />
-                  </Stack>
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, md: 4 }}>
-                  <Stack>
-                    {typeof latestReading?.humidity === "number" && (
-                      <SensorCard
-                        title="Umidade do Solo"
-                        value={latestReading.humidity}
-                        unit="%"
-                        icon={<IconDroplet />}
-                        color="blue"
-                      />
-                    )}
-                    {typeof latestReading?.temperature === "number" && (
-                      <SensorCard
-                        title="Temperatura"
-                        value={latestReading.temperature}
-                        unit="°C"
-                        icon={<IconTemperature />}
-                        color="orange"
-                      />
-                    )}
-                    {typeof latestReading?.luminosity === "number" && (
-                      <SensorCard
-                        title="Luminosidade"
-                        value={latestReading.luminosity}
-                        unit="lux"
-                        icon={<IconSun />}
-                        color="yellow"
-                      />
-                    )}
-
-                    <DeviceStatus
-                      wifiSignal={latestReading?.wifiSignal}
-                      waterLevel={latestReading?.waterLevel}
-                    />
-
                     <ManualControls plantId={plant.id} />
+                    <AiAssistant plantId={plant.id} plantName={plant.name} />
                   </Stack>
                 </Grid.Col>
               </Grid>
