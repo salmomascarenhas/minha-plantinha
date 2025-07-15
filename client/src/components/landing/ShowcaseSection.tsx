@@ -7,10 +7,16 @@ import {
   Stack,
   Text,
   Title,
+  useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import classes from "./ShowcaseSection.module.css";
 
 export function ShowcaseSection() {
+  const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
+  const isDark = colorScheme === "dark";
+
   return (
     <Container size="lg" py="xl" my="xl">
       <Stack align="center" mb="xl">
@@ -30,7 +36,7 @@ export function ShowcaseSection() {
         className={classes.browserFrame}
       >
         <Box
-          bg="dark.6"
+          bg={isDark ? theme.colors.dark[6] : theme.colors.gray[1]}
           p="xs"
           style={{
             borderTopLeftRadius: "var(--mantine-radius-lg)",
@@ -54,7 +60,11 @@ export function ShowcaseSection() {
         </Box>
 
         <Image
-          src="/images/dashboard-showcase.png"
+          src={
+            isDark
+              ? "/images/dashboard-showcase-dark.png"
+              : "/images/dashboard-showcase-light.png"
+          }
           alt="Dashboard da aplicação Minha Plantinha"
           radius="sm"
         />
