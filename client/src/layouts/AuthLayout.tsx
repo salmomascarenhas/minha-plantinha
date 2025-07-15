@@ -19,7 +19,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <Grid gutter={0} className={classes.wrapper}>
       <Grid.Col visibleFrom="md" span={6} className={classes.visualColumn}>
-        <Stack justify="center" h="100%" p="xl">
+        <Stack justify="center" h="100%" p="xl" m="sm">
           <Title order={1} className={classes.title} ta="left">
             Sua jornada verde começa aqui
           </Title>

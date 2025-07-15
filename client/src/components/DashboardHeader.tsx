@@ -285,6 +285,8 @@ export function DashboardHeader() {
             borderTop: `1px solid ${
               isDark ? theme.colors.dark[4] : theme.colors.gray[2]
             }`,
+            background: isDark ? theme.colors.dark[7] : theme.white,
+            backdropFilter: "blur(10px)",
           }}
         >
           <Stack gap="sm">
