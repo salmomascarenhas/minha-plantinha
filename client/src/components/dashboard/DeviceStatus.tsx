@@ -103,6 +103,7 @@ const getWaterStatus = (percentage: number) => {
       label: "Alto",
       status: "high",
       description: "Reservatório cheio",
+      icon: <IconDropletFilled size={24} />,
     };
   if (percentage > 50)
     return {
@@ -110,6 +111,7 @@ const getWaterStatus = (percentage: number) => {
       label: "Médio",
       status: "medium",
       description: "Nível adequado",
+      icon: <IconDropletFilled size={24} />,
     };
   if (percentage > 25)
     return {
@@ -117,12 +119,14 @@ const getWaterStatus = (percentage: number) => {
       label: "Baixo",
       status: "low",
       description: "Precisa reabastecer",
+      icon: <IconDropletFilled size={24} />,
     };
   return {
     colorScheme: "myDanger",
     label: "Crítico",
     status: "critical",
     description: "Reabastecer urgente!",
+    icon: <IconDropletFilled size={24} />,
   };
 };
 
@@ -131,7 +135,7 @@ const getSoilStatus = (status?: number) => {
     return {
       colorScheme: "gray",
       label: "Desconhecido",
-      icon: <IconPlant2 size={20} />,
+      icon: <IconPlant2 size={24} />,
       status: "unknown",
       description: "Status não disponível",
     };
@@ -139,7 +143,7 @@ const getSoilStatus = (status?: number) => {
     return {
       colorScheme: "yellow",
       label: "Seco",
-      icon: <IconSunOff size={20} />,
+      icon: <IconSunOff size={24} />,
       status: "dry",
       description: "Solo necessita irrigação",
     };
@@ -147,14 +151,14 @@ const getSoilStatus = (status?: number) => {
     return {
       colorScheme: "myGreen",
       label: "Úmido",
-      icon: <IconPlant2 size={20} />,
+      icon: <IconPlant2 size={24} />,
       status: "moist",
       description: "Solo em condições ideais",
     };
   return {
     colorScheme: "blue",
     label: "Encharcado",
-    icon: <IconDropletFilled size={20} />,
+    icon: <IconDropletFilled size={24} />,
     status: "soaked",
     description: "Solo com excesso de água",
   };
@@ -165,7 +169,7 @@ const getRainStatus = (detected?: boolean) => {
     return {
       colorScheme: "gray",
       label: "Desconhecido",
-      icon: <IconCloudRain size={20} />,
+      icon: <IconCloudRain size={24} />,
       status: "unknown",
       description: "Sensor não disponível",
     };
@@ -173,14 +177,14 @@ const getRainStatus = (detected?: boolean) => {
     ? {
         colorScheme: "blue",
         label: "Detectada",
-        icon: <IconCloudRain size={20} />,
+        icon: <IconCloudRain size={24} />,
         status: "detected",
         description: "Chuva em andamento",
       }
     : {
         colorScheme: "gray",
         label: "Sem Chuva",
-        icon: <IconCloudRain size={20} />,
+        icon: <IconCloudRain size={24} />,
         status: "clear",
         description: "Tempo seco",
       };
@@ -191,7 +195,7 @@ const getPumpStatus = (active?: boolean) => {
     return {
       colorScheme: "gray",
       label: "Desconhecido",
-      icon: <IconEngine size={20} />,
+      icon: <IconEngine size={24} />,
       status: "unknown",
       description: "Status não disponível",
     };
@@ -199,14 +203,14 @@ const getPumpStatus = (active?: boolean) => {
     ? {
         colorScheme: "myGreen",
         label: "Ativa",
-        icon: <IconEngine size={20} />,
+        icon: <IconEngine size={24} />,
         status: "active",
         description: "Bomba funcionando",
       }
     : {
         colorScheme: "gray",
         label: "Inativa",
-        icon: <IconEngine size={20} />,
+        icon: <IconEngine size={24} />,
         status: "inactive",
         description: "Bomba parada",
       };
@@ -217,7 +221,7 @@ const getCoverStatus = (open?: boolean) => {
     return {
       colorScheme: "gray",
       label: "Desconhecido",
-      icon: <IconSunOff size={20} />,
+      icon: <IconSunOff size={24} />,
       status: "unknown",
       description: "Status não disponível",
     };
@@ -225,16 +229,16 @@ const getCoverStatus = (open?: boolean) => {
     ? {
         colorScheme: "myGreen",
         label: "Aberta",
-        icon: <IconSunOff size={20} />,
+        icon: <IconSunOff size={24} />,
         status: "open",
-        description: "Cobertura retraída",
+        description: "Cobertura ativa",
       }
     : {
         colorScheme: "blue",
         label: "Fechada",
-        icon: <IconSunOff size={20} />,
+        icon: <IconSunOff size={24} />,
         status: "closed",
-        description: "Cobertura ativa",
+        description: "Cobertura inativa",
       };
 };
 

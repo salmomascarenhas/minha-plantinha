@@ -18,7 +18,6 @@ export const submitSensorData = asyncHandler(async (req: Request, res: Response)
     temperature,
     luminosity,
   } = req.body;
-
   const dataForDb = {
     humidity: umidade,
     wifiSignal: status_wifi,
@@ -26,7 +25,7 @@ export const submitSensorData = asyncHandler(async (req: Request, res: Response)
     soilStatus: status_solo,
     temperature: temperature,
     luminosity: luminosity,
-    rainDetected: typeof chuva !== 'undefined' ? chuva === 0 : undefined,
+    rainDetected: typeof chuva !== 'undefined' ? chuva === 1 : undefined,
     pumpStatus: typeof status_bomba !== 'undefined' ? status_bomba === 1 : undefined,
     coverStatus: typeof status_lona !== 'undefined' ? status_lona === 1 : undefined,
   };
