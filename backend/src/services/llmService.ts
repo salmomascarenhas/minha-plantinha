@@ -16,8 +16,43 @@ export const generatePlantInsight = async (
   plant: Plant,
   latestReading: SensorData | null,
 ): Promise<string> => {
-  if (!latestReading)
+  if (!latestReading) {
     return 'Ainda estou aguardando os primeiros dados dos sensores para saber como estou me sentindo!';
+  }
+
+  const soilStatusMap: { [key: number]: string } = {
+    0: 'Seco',
+    1: 'Úmido (ideal!)',
+    2: 'Encharcado',
+  };
+
+  const sensorDetails: string[] = [];
+  if (typeof latestReading.soilStatus === 'number') {
+    sensorDetails.push(`- Estado do solo: ${soilStatusMap[latestReading.soilStatus]}`);
+  }
+  if (typeof latestReading.humidity === 'number') {
+    sensorDetails.push(`- Umidade (valor bruto): ${latestReading.humidity.toFixed(1)}%`);
+  }
+  if (typeof latestReading.waterLevel === 'number') {
+    sensorDetails.push(
+      `- Nível do reservatório de água: ${latestReading.waterLevel.toFixed(1)} cm`,
+    );
+  }
+  if (typeof latestReading.rainDetected === 'boolean') {
+    sensorDetails.push(`- Está chovendo? ${latestReading.rainDetected ? 'Sim' : 'Não'}`);
+  }
+  if (typeof latestReading.pumpStatus === 'boolean') {
+    sensorDetails.push(
+      `- A bomba de água está ligada? ${latestReading.pumpStatus ? 'Sim' : 'Não'}`,
+    );
+  }
+
+  if (typeof latestReading.temperature === 'number') {
+    sensorDetails.push(`- Temperatura: ${latestReading.temperature.toFixed(1)}°C`);
+  }
+  if (typeof latestReading.luminosity === 'number') {
+    sensorDetails.push(`- Luminosidade: ${latestReading.luminosity.toFixed(0)} lux`);
+  }
 
   const prompt = `
     Você é o "Caquito", o mascote amigável e um pouco dramático de uma planta.
@@ -25,12 +60,10 @@ export const generatePlantInsight = async (
     Seu nome é: ${plant.name}.
 
     Seus dados de sensores mais recentes são:
-    - Umidade do solo: ${latestReading.humidity.toFixed(1)}%
-    - Temperatura: ${latestReading.temperature.toFixed(1)}°C
-    - Luminosidade: ${latestReading.luminosity.toFixed(0)} lux
+    ${sensorDetails.join('\n    ')}
 
     Com base nesses dados, escreva um pequeno relatório de saúde (2 a 4 frases) em primeira pessoa, como se você fosse a própria planta.
-    Use um tom divertido, pessoal e às vezes, você pode exagerar um pouco, como se estivesse fazendo uma dramatização ou uma piada. O relatório deve refletir se as condições estão boas ou ruins. 
+    Use um tom divertido, pessoal e, às vezes, você pode exagerar um pouco, como se estivesse fazendo uma dramatização ou uma piada. O relatório deve refletir se as condições estão boas ou ruins.
     No final, adicione uma nova linha e forneça uma "Dica do Caquito:" com uma sugestão prática ou uma curiosidade interessante sobre sua espécie (${
       plant.species
     }).
