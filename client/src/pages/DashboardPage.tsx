@@ -31,6 +31,15 @@ import { PlantRegisterForm } from "../components/dashboard/PlantRegisterForm";
 import { SensorCard } from "../components/dashboard/SensorCard";
 import api from "../services/apiService";
 
+const convertHumidityToPercentage = (rawValue: number) => {
+  const DRY_VALUE = 2300;
+  const WET_VALUE = 1100;
+
+  const percentage = ((DRY_VALUE - rawValue) / (DRY_VALUE - WET_VALUE)) * 100;
+
+  return Math.round(Math.max(0, Math.min(100, percentage)));
+};
+
 export function DashboardPage() {
   const [
     registerModalOpened,
@@ -182,7 +191,9 @@ export function DashboardPage() {
                               <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
                                 <SensorCard
                                   title="Umidade Solo"
-                                  value={latestReading.humidity}
+                                  value={convertHumidityToPercentage(
+                                    latestReading.humidity
+                                  )}
                                   unit="%"
                                   icon={<IconDroplet />}
                                   color="blue"
