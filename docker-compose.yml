@@ -1,5 +1,5 @@
 # ==============================================
-# DOCKER COMPOSE - MULTI ENVIRONMENT
+# DOCKER COMPOSE - PRODUCTION BASE
 # ==============================================
 
 services:
@@ -8,16 +8,13 @@ services:
     container_name: db-${NODE_ENV:-development}
     restart: unless-stopped
     env_file:
-      - .env
       - .env.${NODE_ENV:-development}
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - db_data_${NODE_ENV:-development}:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -29,74 +26,36 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.prod
-      args:
-        - NODE_ENV=${NODE_ENV:-development}
+      dockerfile: dockerfile
+      target: production
     container_name: backend-${NODE_ENV:-development}
     restart: unless-stopped
     env_file:
-      - .env
       - .env.${NODE_ENV:-development}
-    environment:
-      - NODE_ENV=${NODE_ENV:-development}
-      - DATABASE_URL=${DATABASE_URL}
-      - JWT_SECRET=${JWT_SECRET}
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - BACKEND_PORT=${BACKEND_PORT:-3000}
-      - BACKEND_HOST=${BACKEND_HOST:-0.0.0.0}
-    ports:
-      - "${BACKEND_PORT:-3000}:${BACKEND_PORT:-3000}"
+    networks:
+      - app-network
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      # Development volumes (ignored in production)
-      - ./backend/src:/app/src
-      - ./backend/prisma:/app/prisma
-      - ./backend/tsconfig.json:/app/tsconfig.json
-      - ./backend/package.json:/app/package.json
-      - ./backend/package-lock.json:/app/package-lock.json
-      - /app/node_modules
-    networks:
-      - app-network
 
   frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile.prod
-      args:
-        - NODE_ENV=${NODE_ENV:-development}
+      dockerfile: dockerfile
+      target: production
     container_name: frontend-${NODE_ENV:-development}
     restart: unless-stopped
-    env_file:
-      - .env
-      - .env.${NODE_ENV:-development}
-    environment:
-      - NODE_ENV=${NODE_ENV:-development}
-      - VITE_API_URL=${VITE_API_URL}
-      - VITE_APP_TITLE=${VITE_APP_TITLE}
-      - VITE_APP_VERSION=${VITE_APP_VERSION}
-      - VITE_DEBUG_MODE=${VITE_DEBUG_MODE}
-      - BACKEND_PORT=${BACKEND_PORT:-3000}
     ports:
-      - "${FRONTEND_PORT:-5173}:80"
-    volumes:
-      # Development volumes (ignored in production)
-      - ./client:/app
-      - /app/node_modules
-      - /app/dist
-    depends_on:
-      - backend
+      - "8080:80"
     networks:
       - app-network
+    depends_on:
+      - backend
 
 networks:
   app-network:
-    driver: bridge
     name: minha-plantinha-${NODE_ENV:-development}
 
 volumes:
-  db_data_development:
-    name: minha-plantinha-db-development
-  db_data_production:
-    name: minha-plantinha-db-production
+  db_data:
+    name: minha-plantinha-db-${NODE_ENV:-development}
