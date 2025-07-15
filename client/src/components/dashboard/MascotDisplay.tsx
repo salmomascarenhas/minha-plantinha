@@ -7,6 +7,7 @@ import {
   Progress,
   Stack,
   Text,
+  Tooltip,
   Transition,
   useMantineColorScheme,
   useMantineTheme,
@@ -93,28 +94,67 @@ export function MascotDisplay({
   const xpPercentage = (xp / maxXp) * 100;
 
   const isDark = colorScheme === "dark";
-  const colorIndex = 6;
-  const lightColorIndex = 1;
 
-  const stateColor =
-    theme.colors[mascotState.colorScheme as keyof typeof theme.colors]?.[
-      colorIndex
-    ] || theme.colors.gray[colorIndex];
-  const lightStateColor =
-    theme.colors[mascotState.colorScheme as keyof typeof theme.colors]?.[
-      lightColorIndex
-    ] || theme.colors.gray[lightColorIndex];
+  const getStateColors = (colorScheme: string) => {
+    switch (colorScheme) {
+      case "myDanger":
+        return {
+          primary: isDark ? theme.colors.red[3] : theme.colors.red[7],
+          light: isDark ? theme.colors.red[6] : theme.colors.red[3],
+          bg: isDark ? theme.colors.red[9] : theme.colors.red[0],
+          text: isDark ? theme.colors.red[1] : theme.colors.red[9],
+          border: isDark ? theme.colors.red[4] : theme.colors.red[5],
+          badgeText: isDark ? theme.white : theme.colors.red[0],
+        };
+      case "myGreen":
+        return {
+          primary: isDark ? theme.colors.green[3] : theme.colors.green[7],
+          light: isDark ? theme.colors.green[6] : theme.colors.green[3],
+          bg: isDark ? theme.colors.green[9] : theme.colors.green[0],
+          text: isDark ? theme.colors.green[1] : theme.colors.green[9],
+          border: isDark ? theme.colors.green[4] : theme.colors.green[5],
+          badgeText: isDark ? theme.white : theme.colors.green[0],
+        };
+      case "blue":
+        return {
+          primary: isDark ? theme.colors.blue[3] : theme.colors.blue[7],
+          light: isDark ? theme.colors.blue[6] : theme.colors.blue[3],
+          bg: isDark ? theme.colors.blue[9] : theme.colors.blue[0],
+          text: isDark ? theme.colors.blue[1] : theme.colors.blue[9],
+          border: isDark ? theme.colors.blue[4] : theme.colors.blue[5],
+          badgeText: isDark ? theme.white : theme.colors.blue[0],
+        };
+      default:
+        return {
+          primary: isDark ? theme.colors.gray[4] : theme.colors.gray[6],
+          light: isDark ? theme.colors.gray[7] : theme.colors.gray[3],
+          bg: isDark ? theme.colors.gray[8] : theme.colors.gray[1],
+          text: isDark ? theme.colors.gray[3] : theme.colors.gray[7],
+          border: isDark ? theme.colors.gray[5] : theme.colors.gray[4],
+        };
+    }
+  };
+
+  const stateColors = getStateColors(mascotState.colorScheme);
 
   const bgGradient = (() => {
     switch (mascotState.colorScheme) {
       case "myDanger":
-        return `linear-gradient(135deg, ${theme.colors.myDanger[0]} 0%, ${theme.colors.red[1]} 50%, ${theme.colors.pink[0]} 100%)`;
+        return isDark
+          ? `linear-gradient(135deg, ${theme.colors.dark[8]} 0%, ${theme.colors.red[9]} 30%, ${theme.colors.dark[7]} 100%)`
+          : `linear-gradient(135deg, ${theme.colors.red[0]} 0%, ${theme.colors.pink[0]} 50%, ${theme.colors.red[1]} 100%)`;
       case "myGreen":
-        return `linear-gradient(135deg, ${theme.colors.myGreen[0]} 0%, ${theme.colors.cyan[0]} 50%, ${theme.colors.teal[0]} 100%)`;
+        return isDark
+          ? `linear-gradient(135deg, ${theme.colors.dark[8]} 0%, ${theme.colors.green[9]} 30%, ${theme.colors.dark[7]} 100%)`
+          : `linear-gradient(135deg, ${theme.colors.green[0]} 0%, ${theme.colors.teal[0]} 50%, ${theme.colors.green[1]} 100%)`;
       case "blue":
-        return `linear-gradient(135deg, ${theme.colors.blue[0]} 0%, ${theme.colors.cyan[1]} 50%, ${theme.colors.teal[0]} 100%)`;
+        return isDark
+          ? `linear-gradient(135deg, ${theme.colors.dark[8]} 0%, ${theme.colors.blue[9]} 30%, ${theme.colors.dark[7]} 100%)`
+          : `linear-gradient(135deg, ${theme.colors.blue[0]} 0%, ${theme.colors.cyan[0]} 50%, ${theme.colors.blue[1]} 100%)`;
       default:
-        return `linear-gradient(135deg, ${theme.colors.gray[0]} 0%, ${theme.colors.gray[1]} 100%)`;
+        return isDark
+          ? `linear-gradient(135deg, ${theme.colors.dark[8]} 0%, ${theme.colors.dark[6]} 100%)`
+          : `linear-gradient(135deg, ${theme.colors.gray[0]} 0%, ${theme.colors.gray[1]} 100%)`;
     }
   })();
 
@@ -145,9 +185,16 @@ export function MascotDisplay({
             20%, 40%, 60%, 80% { transform: translateX(3px); }
           }
           @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+          .mascot-container {
+            transition: all 0.3s ease;
+            cursor: pointer;
+          }
+          .mascot-container:hover {
+            transform: scale(1.02);
           }
           @keyframes float {
             0%, 100% { transform: translateY(0); }
@@ -163,17 +210,15 @@ export function MascotDisplay({
       <Transition mounted={isVisible} transition="slide-up" duration={500}>
         {(styles) => (
           <Paper
-            p="xl"
-            radius="xl"
-            h={300}
+            className="mascot-container"
+            radius="md"
             style={{
               ...styles,
               background: bgGradient,
-              border: `3px solid ${stateColor}`,
-              boxShadow: `0 8px 32px ${stateColor}30`,
+              border: `3px solid ${stateColors.border}`,
+              boxShadow: `0 8px 16px ${stateColors.primary}30`,
               position: "relative",
               overflow: "hidden",
-              transition: "all 0.3s ease",
             }}
           >
             {/* Efeito de brilho de fundo */}
@@ -196,16 +241,27 @@ export function MascotDisplay({
               {/* Header com informações do nível */}
               <Group justify="space-between" align="center">
                 <Stack gap={4}>
-                  <Text size="sm" fw={600} c="dimmed">
+                  <Text
+                    size="sm"
+                    fw={600}
+                    c={isDark ? theme.colors.gray[2] : theme.colors.gray[7]}
+                    style={{
+                      textShadow: isDark
+                        ? `0 1px 2px ${theme.colors.dark[9]}`
+                        : `0 1px 2px ${theme.colors.white}`,
+                    }}
+                  >
                     {plantName}
                   </Text>
                   <Badge
                     variant="filled"
-                    color={mascotState.colorScheme}
                     size="lg"
                     style={{
                       fontWeight: 700,
-                      boxShadow: `0 2px 8px ${stateColor}40`,
+                      background: `linear-gradient(45deg, ${stateColors.primary} 0%, ${stateColors.border} 100%)`,
+                      color: stateColors.badgeText,
+                      boxShadow: `0 2px 8px ${stateColors.primary}40`,
+                      border: `1px solid ${stateColors.light}`,
                     }}
                   >
                     Nível {level}
@@ -213,14 +269,16 @@ export function MascotDisplay({
                 </Stack>
                 <Badge
                   variant="light"
-                  color={mascotState.colorScheme}
                   size="md"
                   style={{
                     background: isDark
-                      ? `${theme.colors.dark[6]}80`
-                      : `${theme.white}50`,
+                      ? `${theme.colors.dark[6]}`
+                      : `${theme.white}`,
+                    color: stateColors.text,
+                    fontWeight: 600,
                     backdropFilter: "blur(10px)",
-                    border: `1px solid ${lightStateColor}50`,
+                    border: `1px solid ${stateColors.light}`,
+                    boxShadow: `0 2px 8px ${stateColors.primary}20`,
                   }}
                 >
                   {mascotState.healthStatus}
@@ -249,49 +307,87 @@ export function MascotDisplay({
                     {mascotState.emoji}
                   </Box>
 
-                  <Text
-                    fw={500}
-                    size="md"
-                    ta="center"
-                    c={isDark ? "gray.1" : "dark.8"}
-                    style={{
-                      textShadow: `0 2px 4px ${
-                        isDark ? theme.colors.dark[9] : theme.colors.gray[3]
-                      }50`,
-                      maxWidth: 220,
-                      lineHeight: 1.4,
-                    }}
+                  <Tooltip
+                    label={
+                      mascotState.text.length > 50 ? mascotState.text : null
+                    }
+                    multiline
+                    w={300}
+                    disabled={mascotState.text.length <= 50}
                   >
-                    {mascotState.text}
-                  </Text>
+                    <Text
+                      fw={500}
+                      size="md"
+                      ta="center"
+                      c={isDark ? theme.colors.gray[1] : theme.colors.gray[8]}
+                      style={{
+                        textShadow: isDark
+                          ? `0 2px 4px ${theme.colors.dark[9]}`
+                          : `0 2px 4px ${theme.colors.gray[3]}`,
+                        maxWidth: 220,
+                        lineHeight: 1.4,
+                        background: isDark
+                          ? `${theme.colors.dark[6]}60`
+                          : `${theme.white}70`,
+                        padding: "8px 16px",
+                        borderRadius: "12px",
+                        backdropFilter: "blur(8px)",
+                        border: `1px solid ${
+                          isDark ? theme.colors.dark[4] : theme.colors.gray[2]
+                        }`,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {mascotState.text}
+                    </Text>
+                  </Tooltip>
                 </Stack>
               </Center>
 
               {/* Footer com XP e dicas */}
               <Stack gap="xs">
                 <Group justify="space-between" align="center">
-                  <Text size="xs" fw={500} c="dimmed">
+                  <Text
+                    size="xs"
+                    fw={500}
+                    c={isDark ? theme.colors.gray[3] : theme.colors.gray[6]}
+                  >
                     Experiência
                   </Text>
-                  <Text size="xs" fw={600} c="dimmed">
+                  <Text
+                    size="xs"
+                    fw={600}
+                    c={isDark ? theme.colors.gray[2] : theme.colors.gray[7]}
+                  >
                     {xp}/{maxXp} XP
                   </Text>
                 </Group>
 
                 <Progress
                   value={xpPercentage}
-                  color={mascotState.colorScheme}
                   size="lg"
                   radius="xl"
                   striped={mascotState.mood === "happy"}
                   animated={mascotState.mood === "happy"}
                   style={{
                     background: isDark
-                      ? `${theme.colors.dark[6]}60`
-                      : `${theme.white}30`,
+                      ? `${theme.colors.dark[6]}80`
+                      : `${theme.white}60`,
                     boxShadow: `inset 0 2px 4px ${
                       isDark ? theme.colors.dark[9] : theme.colors.gray[3]
-                    }20`,
+                    }30`,
+                    border: `1px solid ${
+                      isDark ? theme.colors.dark[4] : theme.colors.gray[2]
+                    }`,
+                  }}
+                  styles={{
+                    section: {
+                      background: `linear-gradient(90deg, ${stateColors.primary} 0%, ${stateColors.border} 100%)`,
+                    },
                   }}
                 />
 
@@ -302,29 +398,45 @@ export function MascotDisplay({
                   key={showTip}
                 >
                   {(tipStyles) => (
-                    <Text
-                      size="xs"
-                      ta="center"
-                      c="dimmed"
-                      fw={500}
-                      style={{
-                        ...tipStyles,
-                        background: isDark
-                          ? `${theme.colors.dark[6]}70`
-                          : `${theme.white}40`,
-                        padding: "6px 12px",
-                        borderRadius: "12px",
-                        backdropFilter: "blur(10px)",
-                        border: `1px solid ${
-                          isDark ? theme.colors.dark[4] : theme.white
-                        }40`,
-                        boxShadow: `0 2px 8px ${
-                          isDark ? theme.colors.dark[9] : theme.colors.gray[3]
-                        }20`,
-                      }}
+                    <Tooltip
+                      label={
+                        mascotState.tips[showTip].length > 40
+                          ? `💡 ${mascotState.tips[showTip]}`
+                          : null
+                      }
+                      multiline
+                      w={280}
+                      disabled={mascotState.tips[showTip].length <= 40}
                     >
-                      💡 {mascotState.tips[showTip]}
-                    </Text>
+                      <Text
+                        size="xs"
+                        ta="center"
+                        c={isDark ? theme.colors.gray[2] : theme.colors.gray[7]}
+                        fw={500}
+                        style={{
+                          ...tipStyles,
+                          background: isDark
+                            ? `${theme.colors.dark[6]}90`
+                            : `${theme.white}80`,
+                          padding: "8px 16px",
+                          borderRadius: "16px",
+                          backdropFilter: "blur(10px)",
+                          border: `1px solid ${stateColors.light}`,
+                          boxShadow: `0 2px 8px ${stateColors.primary}20`,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          cursor:
+                            mascotState.tips[showTip].length > 40
+                              ? "help"
+                              : "default",
+                        }}
+                      >
+                        💡 {mascotState.tips[showTip]}
+                      </Text>
+                    </Tooltip>
                   )}
                 </Transition>
               </Stack>
