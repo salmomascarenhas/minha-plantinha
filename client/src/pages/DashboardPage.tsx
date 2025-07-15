@@ -10,10 +10,11 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDroplet, IconSun, IconTemperature } from "@tabler/icons-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { AiAssistant } from "../components/dashboard/AiAssistant";
 import { ApiKeyDisplayModal } from "../components/dashboard/ApiKeyDisplayModal";
+import { DeviceStatus } from "../components/dashboard/DeviceStatus";
 import { GamificationStatus } from "../components/dashboard/GamificationStatus";
 import { HistoryChart } from "../components/dashboard/HistoryChart";
 import { ManualControls } from "../components/dashboard/ManualControls";
@@ -24,7 +25,6 @@ import { SensorCard } from "../components/dashboard/SensorCard";
 import api from "../services/apiService";
 
 export function DashboardPage() {
-  const queryClient = useQueryClient();
   const [
     registerModalOpened,
     { open: openRegisterModal, close: closeRegisterModal },
@@ -42,15 +42,6 @@ export function DashboardPage() {
     setNewlyGeneratedApiKey(null);
   };
 
-  // Função para gerenciar o reetch do React Query
-  useEffect(() => {
-    if (registerModalOpened) {
-      queryClient.setQueryDefaults(["myPlantData"], { refetchInterval: false });
-    } else {
-      queryClient.setQueryDefaults(["myPlantData"], { refetchInterval: 10000 });
-    }
-  }, [registerModalOpened, queryClient]);
-
   const {
     data: plantData,
     isLoading: isLoadingPlant,
@@ -62,17 +53,17 @@ export function DashboardPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     retry: (failureCount, error: any) =>
       error.response?.status !== 404 && failureCount < 3,
-  }); // Remove o refetchInterval daqui pois agora é gerenciado dinamicamente
+    refetchInterval: registerModalOpened ? false : 10000,
+  });
 
   const { data: gamificationData, isLoading: isLoadingGamification } = useQuery(
     {
       queryKey: ["gamificationStatus"],
       queryFn: () => api.get("/gamification/status").then((res) => res.data),
-      enabled: !!plantData,
+      enabled: !!plantData, // Só busca dados de gamificação se a planta existir
     }
   );
 
-  // Enquanto a query principal carrega, mostre o loader principal
   if (isLoadingPlant) {
     return (
       <Center h="80vh">
@@ -91,10 +82,15 @@ export function DashboardPage() {
     );
   }
 
-  // O componente agora retorna uma estrutura principal única
+  const level = gamificationData?.points
+    ? Math.floor(gamificationData.points / 100) + 1
+    : 1;
+  const currentLevelXp = gamificationData?.points
+    ? gamificationData.points % 100
+    : 0;
+
   return (
     <>
-      {/* 1. MOVA OS MODAIS PARA CÁ: Eles agora existem fora de qualquer condição */}
       <Modal
         opened={registerModalOpened}
         onClose={closeRegisterModal}
@@ -109,18 +105,14 @@ export function DashboardPage() {
         onClose={handleApiKeyModalClose}
       />
 
-      {/* 2. A lógica condicional decide o que mostrar no corpo da página */}
       {plantData ? (
-        // Se HÁ planta, mostre o dashboard completo
         (() => {
           const { plant } = plantData;
           const latestReading = plant.SensorData?.[0];
 
           return (
             <Stack gap="xl">
-              <Title order={1}>
-                Painel de Controle: {plantData.plant.name}
-              </Title>
+              <Title order={1}>Painel de Controle: {plant.name}</Title>
 
               {isLoadingGamification ? (
                 <Paper p="lg" radius="md" withBorder>
@@ -133,44 +125,52 @@ export function DashboardPage() {
               <Grid>
                 <Grid.Col span={{ base: 12, md: 8 }}>
                   <Stack>
-                    <MascotDisplay humidity={latestReading?.humidity} />
-                    <AiAssistant plantId={plant.id} />
+                    <MascotDisplay
+                      soilStatus={latestReading?.soilStatus}
+                      plantName={plant.name}
+                      level={level}
+                      xp={currentLevelXp}
+                      maxXp={100}
+                    />
+                    <AiAssistant plantId={plant.id} plantName={plant.name} />
                     <HistoryChart plantId={plant.id} />
                   </Stack>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, md: 4 }}>
                   <Stack>
-                    {latestReading ? (
-                      <>
-                        <SensorCard
-                          title="Umidade"
-                          value={latestReading.humidity}
-                          unit="%"
-                          icon={<IconDroplet />}
-                          color="blue"
-                        />
-                        <SensorCard
-                          title="Temperatura"
-                          value={latestReading.temperature}
-                          unit="°C"
-                          icon={<IconTemperature />}
-                          color="orange"
-                        />
-                        <SensorCard
-                          title="Luminosidade"
-                          value={latestReading.luminosity}
-                          unit="lux"
-                          icon={<IconSun />}
-                          color="yellow"
-                        />
-                      </>
-                    ) : (
-                      <Paper p="md">
-                        <Text>
-                          Aguardando primeira leitura do dispositivo...
-                        </Text>
-                      </Paper>
+                    {typeof latestReading?.humidity === "number" && (
+                      <SensorCard
+                        title="Umidade do Solo"
+                        value={latestReading.humidity}
+                        unit="%"
+                        icon={<IconDroplet />}
+                        color="blue"
+                      />
                     )}
+                    {typeof latestReading?.temperature === "number" && (
+                      <SensorCard
+                        title="Temperatura"
+                        value={latestReading.temperature}
+                        unit="°C"
+                        icon={<IconTemperature />}
+                        color="orange"
+                      />
+                    )}
+                    {typeof latestReading?.luminosity === "number" && (
+                      <SensorCard
+                        title="Luminosidade"
+                        value={latestReading.luminosity}
+                        unit="lux"
+                        icon={<IconSun />}
+                        color="yellow"
+                      />
+                    )}
+
+                    <DeviceStatus
+                      wifiSignal={latestReading?.wifiSignal}
+                      waterLevel={latestReading?.waterLevel}
+                    />
+
                     <ManualControls plantId={plant.id} />
                   </Stack>
                 </Grid.Col>
@@ -179,7 +179,6 @@ export function DashboardPage() {
           );
         })()
       ) : (
-        // Se NÃO HÁ planta, mostre a NoPlantView
         <NoPlantView onRegisterClick={openRegisterModal} />
       )}
     </>
