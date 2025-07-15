@@ -3,7 +3,6 @@ import {
   Box,
   Group,
   Paper,
-  Progress,
   Stack,
   Text,
   ThemeIcon,
@@ -16,9 +15,7 @@ import {
 import {
   IconCloudRain,
   IconDeviceDesktop,
-  IconDropletFilled,
   IconEngine,
-  IconPlant2,
   IconSignal2g,
   IconSignal3g,
   IconSignal4g,
@@ -47,11 +44,9 @@ interface ColorInfo {
 
 interface DeviceStatusProps {
   wifiSignal?: number;
-  waterLevel?: number;
   rainDetected?: boolean;
   pumpStatus?: boolean;
   coverStatus?: boolean;
-  soilStatus?: number; // 0: seco, 1: úmido, 2: encharcado
 }
 
 const getWifiStatus = (dbi?: number) => {
@@ -93,74 +88,6 @@ const getWifiStatus = (dbi?: number) => {
     icon: <IconSignal2g size={24} />,
     status: "poor",
     description: "Sinal muito fraco",
-  };
-};
-
-const getWaterStatus = (percentage: number) => {
-  if (percentage > 75)
-    return {
-      colorScheme: "myGreen",
-      label: "Alto",
-      status: "high",
-      description: "Reservatório cheio",
-      icon: <IconDropletFilled size={24} />,
-    };
-  if (percentage > 50)
-    return {
-      colorScheme: "cyan",
-      label: "Médio",
-      status: "medium",
-      description: "Nível adequado",
-      icon: <IconDropletFilled size={24} />,
-    };
-  if (percentage > 25)
-    return {
-      colorScheme: "yellow",
-      label: "Baixo",
-      status: "low",
-      description: "Precisa reabastecer",
-      icon: <IconDropletFilled size={24} />,
-    };
-  return {
-    colorScheme: "myDanger",
-    label: "Crítico",
-    status: "critical",
-    description: "Reabastecer urgente!",
-    icon: <IconDropletFilled size={24} />,
-  };
-};
-
-const getSoilStatus = (status?: number) => {
-  if (typeof status === "undefined")
-    return {
-      colorScheme: "gray",
-      label: "Desconhecido",
-      icon: <IconPlant2 size={24} />,
-      status: "unknown",
-      description: "Status não disponível",
-    };
-  if (status === 0)
-    return {
-      colorScheme: "yellow",
-      label: "Seco",
-      icon: <IconSunOff size={24} />,
-      status: "dry",
-      description: "Solo necessita irrigação",
-    };
-  if (status === 1)
-    return {
-      colorScheme: "myGreen",
-      label: "Úmido",
-      icon: <IconPlant2 size={24} />,
-      status: "moist",
-      description: "Solo em condições ideais",
-    };
-  return {
-    colorScheme: "blue",
-    label: "Encharcado",
-    icon: <IconDropletFilled size={24} />,
-    status: "soaked",
-    description: "Solo com excesso de água",
   };
 };
 
@@ -307,11 +234,9 @@ const getOptimizedColors = (
 
 export function DeviceStatus({
   wifiSignal,
-  waterLevel,
   rainDetected,
   pumpStatus,
   coverStatus,
-  soilStatus,
 }: DeviceStatusProps) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -319,21 +244,11 @@ export function DeviceStatus({
 
   const isDark = colorScheme === "dark";
   const wifi = getWifiStatus(wifiSignal);
-
-  const waterPercentage =
-    typeof waterLevel !== "undefined"
-      ? Math.min((waterLevel / 21) * 100, 100)
-      : 0;
-
-  const water = getWaterStatus(waterPercentage);
-  const soil = getSoilStatus(soilStatus);
   const rain = getRainStatus(rainDetected);
   const pump = getPumpStatus(pumpStatus);
   const cover = getCoverStatus(coverStatus);
 
   const wifiColors = getOptimizedColors(wifi.colorScheme, theme, isDark);
-  const waterColors = getOptimizedColors(water.colorScheme, theme, isDark);
-  const soilColors = getOptimizedColors(soil.colorScheme, theme, isDark);
   const rainColors = getOptimizedColors(rain.colorScheme, theme, isDark);
   const pumpColors = getOptimizedColors(pump.colorScheme, theme, isDark);
   const coverColors = getOptimizedColors(cover.colorScheme, theme, isDark);
@@ -478,10 +393,10 @@ export function DeviceStatus({
                   </ThemeIcon>
                   <Box>
                     <Title order={4} c={isDark ? "gray.1" : "gray.9"}>
-                      Status do Dispositivo
+                      Status Operacional
                     </Title>
                     <Text size="sm" c="dimmed">
-                      Sensores e atuadores
+                      Sistema e equipamentos
                     </Text>
                   </Box>
                 </Group>
@@ -522,7 +437,7 @@ export function DeviceStatus({
                 </Badge>
               </Group>
 
-              {/* Status Cards Grid */}
+              {/* Status Cards Grid - Apenas Status Operacionais */}
               <Stack gap="md">
                 <StatusCard
                   title="📶 Sinal Wi-Fi"
@@ -535,40 +450,6 @@ export function DeviceStatus({
                       </Text>
                     )
                   }
-                />
-
-                <StatusCard
-                  title="💧 Nível do Reservatório"
-                  status={water}
-                  colors={waterColors}
-                  extra={
-                    <>
-                      <Text size="xs" c="dimmed" mt={2}>
-                        {waterPercentage.toFixed(0)}% capacidade
-                      </Text>
-                      <Progress
-                        value={waterPercentage}
-                        size="lg"
-                        radius="md"
-                        mt="sm"
-                        style={{
-                          "& .mantineProgressBar": {
-                            background: `linear-gradient(90deg, ${waterColors.primary}, ${waterColors.primary})`,
-                            animation:
-                              waterPercentage > 0
-                                ? "waterFlow 2s ease-in-out infinite"
-                                : "none",
-                          },
-                        }}
-                      />
-                    </>
-                  }
-                />
-
-                <StatusCard
-                  title="🌱 Status do Solo"
-                  status={soil}
-                  colors={soilColors}
                 />
 
                 <StatusCard
