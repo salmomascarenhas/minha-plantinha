@@ -40,6 +40,16 @@ const convertHumidityToPercentage = (rawValue: number) => {
   return Math.round(Math.max(0, Math.min(100, percentage)));
 };
 
+const convertWaterLevelToPercentage = (distanceCm: number) => {
+  const MAX_DISTANCE = 21; // Reservatório vazio
+  const MIN_DISTANCE = 0; // Reservatório cheio
+
+  const percentage =
+    ((MAX_DISTANCE - distanceCm) / (MAX_DISTANCE - MIN_DISTANCE)) * 100;
+
+  return Math.round(Math.max(0, Math.min(100, percentage)));
+};
+
 export function DashboardPage() {
   const [
     registerModalOpened,
@@ -82,7 +92,7 @@ export function DashboardPage() {
     {
       queryKey: ["gamificationStatus"],
       queryFn: () => api.get("/gamification/status").then((res) => res.data),
-      enabled: !!plantData, // Só busca dados de gamificação se a planta existir
+      enabled: !!plantData,
     }
   );
 
@@ -228,13 +238,19 @@ export function DashboardPage() {
                               <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
                                 <SensorCard
                                   title="Nível do Reservatório"
-                                  value={latestReading.waterLevel}
-                                  unit="cm"
+                                  value={convertWaterLevelToPercentage(
+                                    latestReading.waterLevel
+                                  )}
+                                  unit="%"
                                   icon={<IconDroplet />}
                                   color={
-                                    latestReading.waterLevel < 10
+                                    convertWaterLevelToPercentage(
+                                      latestReading.waterLevel
+                                    ) < 15
                                       ? "red"
-                                      : latestReading.waterLevel < 30
+                                      : convertWaterLevelToPercentage(
+                                          latestReading.waterLevel
+                                        ) < 40
                                       ? "yellow"
                                       : "myGreen"
                                   }

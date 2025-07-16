@@ -42,7 +42,7 @@ export function SensorCard({
     if (title.includes("Temperatura")) return Math.min((value / 40) * 100, 100);
     if (title.includes("Luminosidade"))
       return Math.min((value / 1000) * 100, 100);
-    if (title.includes("Nível")) return Math.min((value / 21) * 100, 100);
+    if (title.includes("Nível")) return Math.min(value, 100);
     if (title.includes("Condição"))
       return value === 1 ? 100 : value === 0 ? 25 : 75;
     return Math.min(value, 100);
