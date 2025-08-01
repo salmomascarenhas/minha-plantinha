@@ -129,6 +129,35 @@ O script `docker-manager.sh` simplifica todo o processo.
 
 -----
 
+### 🧪 Testando o sistema com Mock do ESP32
+
+Caso você deseje simular o funcionamento do hardware embarcado sem o dispositivo físico, incluímos um **mock** simples que reproduz o envio de dados à API, ideal para testes locais.
+
+**🗂 Caminho do mock:**
+`backend/esp32-mock.js`
+
+#### ▶️ Executando o mock
+
+```bash
+# Acesse a pasta do backend
+cd backend
+
+# Abra o arquivo para editar
+nano esp32-mock.js
+```
+
+Antes de rodar, **substitua manualmente a API key no script** pela que você recebe ao cadastrar uma planta na aplicação. Esse valor é essencial para autenticar o dispositivo simulado.
+
+```bash
+# Após editar, execute o mock com Node.js
+node esp32-mock.js
+```
+
+> ⚠️ As API keys geradas são exclusivas para cada planta. Copie a sua após o pareamento no dashboard.
+
+Esse mock envia dados de sensores simulados para a API em intervalos definidos, possibilitando validar o comportamento do backend, da lógica de gamificação e da visualização no frontend sem precisar do ESP32 real.
+---
+
 ### 🚨 Solução de Problemas
 
 Para erros comuns como portas em uso, falhas de build ou problemas de permissão, consulte nosso guia detalhado:
