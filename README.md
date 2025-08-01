@@ -1,135 +1,145 @@
 # 🌿 Minha Plantinha: Sistema de Irrigação Gamificado
+
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Nginx](https://img.shields.io/badge/nginx-009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 ![Mantine](https://img.shields.io/badge/Mantine-339AF0?style=for-the-badge&logo=mantine&logoColor=white)
-![Rive](https://img.shields.io/badge/Rive-E85599?style=for-the-badge&logo=rive&logoColor=white)
-
-## 📄 Índice
-1.  [🎯 Sobre o Projeto](#-sobre-o-projeto)
-2.  [✨ Funcionalidades Principais](#-funcionalidades-principais)
-3.  [🏗️ Arquitetura do Sistema](#️-arquitetura-do-sistema)
-4.  [🛠️ Stack de Tecnologias](#️-stack-de-tecnologias)
-5.  [🚀 Como Rodar o Projeto](#-como-rodar-o-projeto)
-6.  [✅ Andamento e Próximos Passos](#-andamento-e-próximos-passos)
-7.  [👨‍💻 Equipe](#-equipe)
 
 ## 🎯 Sobre o Projeto
-"Minha Plantinha" é um sistema que busca transformar o cuidado com plantas em uma experiência interativa, divertida e emocionalmente recompensadora. A plataforma integra uma **interface web gamificada** com um **dispositivo embarcado (ESP32)** para monitorar e controlar um sistema de irrigação automático.
 
-O coração do projeto é o "Caquito", um mascote virtual cujas emoções e reações refletem o estado de saúde da planta real, com base nos dados coletados por sensores de umidade, temperatura e luminosidade. O objetivo é engajar o usuário no cuidado diário, fortalecer o vínculo com a natureza e promover a consciência ambiental de forma lúdica.
+**Minha Plantinha** é um sistema gamificado que transforma o cuidado com plantas em uma experiência interativa e recompensadora, integrando uma interface web moderna com um dispositivo IoT (ESP32) para monitoramento e controle automático de irrigação.
 
-## ✨ Funcionalidades Principais
-O sistema foi planejado com as seguintes funcionalidades centrais:
+O coração do projeto é o "Caquito", um mascote virtual cujas emoções refletem a saúde da planta real, com base nos dados dos sensores, engajando o usuário no cuidado diário e promovendo a consciência ambiental de forma lúdica.
 
-* 🔐 **Autenticação de Usuários (PLT-001):** Sistema de login e cadastro seguro com e-mail e senha, utilizando JWT para gerenciamento de sessões.
-* 🪴 **Gestão da Planta (PLT-002):** Permite que o usuário cadastre sua planta e a vincule a um dispositivo ESP32 específico através de um ID de pareamento.
-* 📊 **Monitoramento em Tempo Real (PLT-003):** Um dashboard exibe dados vitais da planta, como umidade do solo, temperatura, luminosidade e status de chuva, atualizados em tempo real.
-* 💧 **Controle Remoto (PLT-004):** Botões na interface para acionar manualmente a bomba d'água ou uma lona de proteção.
-* 🎮 **Gamificação (PLT-005):** Sistema de pontos, conquistas e medalhas para recompensar os bons cuidados. O mascote reage com animações (feliz, triste, seco) de acordo com o estado da planta.
-* 🤖 **Assistente com IA (PLT-006):** Um assistente virtual que utiliza um modelo de linguagem (LLM) para gerar dicas, relatórios e alertas personalizados sobre a saúde da planta.
-* 📈 **Histórico de Dados (PLT-007):** Gráficos que exibem o histórico semanal e mensal dos dados coletados pelos sensores.
+## ✨ Funcionalidades
 
-## 🏗️ Arquitetura do Sistema
-O projeto é modular e segue uma arquitetura de três camadas principais, baseada no padrão MVC:
-
-1.  🌐 **Módulo Frontend (View):** A interface web responsiva com a qual o usuário interage Responsável por exibir o dashboard, as animações do mascote e os controles.
-
-2. 🔗 **Módulo Backend (Controller/Model):** O cérebro do sistema. Um servidor Node.js/Express que gerencia a autenticação, a lógica de negócio, as regras de gamificação, a comunicação com o banco de dados e a API para o frontend e o dispositivo IoT.
-
-3. 📡 **Módulo Embarcado (Hardware):** O dispositivo ESP32, responsável por ler os dados dos sensores (umidade, temperatura, etc.) e controlar os atuadores (bomba d'água, motor da lona).
+* 🔐 **Autenticação de Usuários:** Sistema seguro de login e cadastro com JWT.
+* 🪴 **Gestão da Planta:** Cadastro de plantas e pareamento com dispositivos IoT.
+* 📊 **Monitoramento em Tempo Real:** Dashboard com dados de umidade, temperatura e luminosidade.
+* 💧 **Controle Remoto:** Acionamento manual da bomba d'água e de proteções.
+* 🎮 **Gamificação:** Sistema de pontos e conquistas com o mascote "Caquito".
+* 🤖 **Assistente com IA:** Dicas personalizadas sobre a saúde da planta usando Google Gemini.
+* 📈 **Histórico de Dados:** Gráficos com o histórico dos sensores.
 
 ## 🛠️ Stack de Tecnologias
-| Categoria | Tecnologia | Finalidade |
-| :--- | :--- | :--- |
-| **Frontend** | `HTML` / `EJS` | Estrutura e renderização de páginas no servidor. |
-| | `Mantine (v8)` | Biblioteca de componentes para uma UI moderna e responsiva. |
-| **Animação** | `Rive` | Criação de animações vetoriais interativas e de alta performance para o mascote. |
-| **Backend** | `Node.js` / `Express` | Ambiente de execução e framework para a construção da API REST. |
-| **Banco de Dados** | `Prisma` | ORM para comunicação segura e eficiente com o banco de dados. |
-| **Autenticação** | `JWT` | Geração de tokens para proteger rotas e gerenciar sessões de usuários |
-| **Comunicação IoT**| `REST API` / `MQTT` | Protocolos para a comunicação entre o ESP32 e o backend. |
-| **Inteligência Artificial**| `LLM (Gemini)` | Geração de conteúdo dinâmico, como dicas e relatórios. |
+
+| Categoria      | Tecnologia          | Finalidade                              |
+| :------------- | :------------------ | :-------------------------------------- |
+| **Frontend** | React + Mantine     | UI moderna e responsiva                 |
+| **Backend** | Node.js + Express   | API REST robusta                        |
+| **Banco de Dados** | PostgreSQL + Prisma | Persistência de dados e ORM type-safe |
+| **Autenticação** | JWT                 | Gerenciamento de sessões seguras        |
+| **Deploy** | Docker + Nginx      | Containerização e proxy reverso         |
+| **IoT** | ESP32 + Sensores    | Hardware embarcado                      |
+| **IA** | Google Gemini       | Assistente inteligente                  |
+
+## 🐳 Ambientes e Docker
+
+O projeto é totalmente containerizado com Docker e foi projetado para rodar em dois ambientes distintos, gerenciados pelo script `docker-manager.sh`.
+
+### **Desenvolvimento (`dev`)**
+
+-   **Foco:** Agilidade e produtividade.
+-   **Hot-Reload:** Frontend e Backend atualizam automaticamente no container ao salvar alterações no código.
+-   **Servidores:** Vite Dev Server para o frontend, `ts-node-dev` para o backend.
+-   **Logs:** Detalhados para facilitar o debug.
+
+### **Produção (`prod`)**
+
+-   **Foco:** Performance, segurança e estabilidade.
+-   **Otimização:** Código compilado para JavaScript puro. Imagens Docker enxutas com multi-stage builds.
+-   **Servidores:** Nginx servindo o build estático do React e atuando como proxy reverso para a API.
+-   **Segurança:** Execução com usuário não-root e configuração de segurança no Nginx.
 
 ## 🚀 Como Rodar o Projeto
-Graças ao uso de Docker, o ambiente de desenvolvimento pode ser iniciado com um único comando.
 
-**Pré-requisitos:**
-* `Git`
-* `Docker`
-* `Docker Compose`
+### **📋 Pré-requisitos**
 
-**Passos para a execução:**
+-   **Git** (v2.0 ou superior)
+-   **Docker** (v20.0 ou superior)
+-   **Docker Compose** (v2.0 ou superior)
+
+### **Passo 1: Clonar o Repositório**
 
 ```bash
-# 1. Clone o repositório
-git clone [https://github.com/salmomascarenhas/minha-plantinha](https://github.com/salmomascarenhas/minha-plantinha)
-
-# 2. Navegue até o diretório do projeto
+git clone https://github.com/salmomascarenhas/minha-plantinha.git
 cd minha-plantinha
-
-# 3. Configure as variáveis de ambiente
-# Crie um arquivo .env na raiz do projeto, a partir do exemplo fornecido.
-# Este passo é crucial para o funcionamento da aplicação.
-cp .env.example .env
-
-# Preencha o arquivo .env com suas credenciais (banco de dados, segredos, etc.)
-
-# 4. Suba os contêineres com o Docker Compose
-# Este comando irá construir as imagens e iniciar todos os serviços
-# (aplicação, banco de dados, etc.)
-docker-compose up
-
-# Para rodar em segundo plano (detached mode), use a flag -d:
-# docker-compose up -d
 ````
 
-O serviço da aplicação está configurado para executar as migrações do Prisma automaticamente ao iniciar. Após a execução, a API estará disponível em `http://localhost:3000` (ou na porta que você definir no seu `.env`).
+### **Passo 2: Configurar as Variáveis de Ambiente**
 
-## ✅ Andamento e Próximos Passos
-Acompanhe aqui o status de desenvolvimento de cada funcionalidade.
+Os arquivos `.env.*` na raiz do projeto controlam as configurações.
 
-  * [x] **Fase 0: Planejamento e Configuração**
-      * [x] Definição do escopo e requisitos do projeto.
-      * [x] Definição da arquitetura e da stack de tecnologias.
-      * [x] Criação da estrutura inicial do projeto e do `README`.
+  - **Para Desenvolvimento:** O arquivo `.env.development` já vem pré-configurado e pronto para uso.
+  - **Para Produção:** Você precisa criar e configurar o arquivo `.env.production`.
 
-  * [ ] **Fase 1: Backend (API & Lógica de Negócio)**
-      * [x] `PLT-001`: Implementar rotas de autenticação (cadastro, login) com JWT.
-      * [x] `PLT-002`: Implementar endpoints CRUD para gerenciamento de plantas e pareamento com o ESP32.
-      * [x] Criar endpoints para receber e armazenar os dados dos sensores.
-      * [x] `PLT-004`: Criar endpoints para acionamento remoto dos atuadores.
-      * [⏳] `PLT-005`: Modelar e implementar a lógica de gamificação (pontuação e conquistas).
-      * [x] `PLT-007`: Desenvolver endpoints para consulta de histórico de dados.
-      
-  * [ ] **Fase 2: Frontend (UI & Integração)**
-      * [x] Construir as telas de Login e Cadastro.
-      * [x] Desenvolver o Dashboard principal.
-      * [x] `PLT-003`: Integrar o dashboard com a API para exibir dados em tempo real.
-      * [⏳] `PLT-005`: Integrar a animação do Rive e fazer com que ela reaja aos dados.
-      * [x] Implementar a interface de controle remoto.
-      * [x] `PLT-007`: Criar os gráficos para a visualização do histórico.
-      * [ ] Implementar o tema claro/escuro.
-    
-  * [ ] **Fase 3: IoT (Dispositivo Embarcado)**
-      * [ ] Desenvolver o código para o ESP32 ler os sensores de umidade, temperatura e luminosidade.
-      * [ ] Implementar a comunicação (via REST ou MQTT) para enviar os dados ao backend.
-      * [ ] Implementar a lógica para receber comandos do backend e acionar a bomba e o motor.
+<!-- end list -->
 
-  * [ ] **Fase 4: Funcionalidades Avançadas**
-      * [⏳] `PLT-006`: Integrar com a API do LLM para gerar as dicas do assistente virtual.
-      * [ ] Implementar testes de unidade e integração.
-      * [ ] Configurar pipeline de CI/CD (Opcional).
+```bash
+# 1. Copie o arquivo de desenvolvimento como base para produção
+cp .env.development .env.production
 
-  * [ ] **Fase 5: Melhorias Extras (Opcional)**
-      * [ ] Permitir que o usuário se conecte ao hardware utilizando uma interface para detectar dispositivos na rede.
-      * [ ] Integrar Frontend com uma biblioteca reativa moderna.
-      * [ ] Refinar o design da interface.
-      
-# 👨‍💻 Equipe
-| Nome | Matrícula | E-mail |
-| :--- | :--- | :--- |
-| Francisco Cassiano de Vasconcelos Souza | 413067 | casinho.555@gmail.com
-Salmo da Cruz Mascarenhas | 431447 | salmo.cruz@gmail.com
-Akyla de Aquino Pinto | 412723 | akylaaquino@hotmail.com 
+# 2. Edite o arquivo .env.production e altere as variáveis críticas
+nano .env.production
+```
+
+**Altere estas variáveis em `.env.production`:**
+
+```env
+# Mude a porta do frontend para produção, se desejar (ex: 8080)
+FRONTEND_PORT=8080
+
+# GERE NOVAS CHAVES SEGURAS PARA PRODUÇÃO!
+JWT_SECRET="gere_uma_nova_chave_super_segura_com_pelo_menos_32_caracteres"
+GEMINI_API_KEY="sua_chave_real_do_google_gemini_aqui"
+```
+
+### **Passo 3: Usar o Gerenciador Docker**
+
+O script `docker-manager.sh` simplifica todo o processo.
+
+```bash
+# Para iniciar o ambiente de DESENVOLVIMENTO
+./docker-manager.sh up dev
+
+# Para iniciar o ambiente de PRODUÇÃO
+./docker-manager.sh up prod
+```
+
+### 🎛️ Comandos do Gerenciador
+
+| Comando                  | Descrição                                                                      |
+| :----------------------- | :----------------------------------------------------------------------------- |
+| `up [dev\|prod]`         | Constrói as imagens (se necessário) e sobe os containers do ambiente escolhido.    |
+| `down`                   | Para e remove os containers e a rede do último ambiente executado.               |
+| `build [dev\|prod]`      | Força a reconstrução das imagens para o ambiente escolhido, sem usar cache.      |
+| `restart [dev\|prod]`    | Reinicia os containers do ambiente.                                              |
+| `logs`                   | Exibe os logs de todos os containers em tempo real.                              |
+| `clean`                  | Para tudo e remove containers, redes e **volumes de banco de dados**. CUIDADO\!   |
+| `help` (ou sem comando)  | Mostra a ajuda do script.                                                      |
+
+### 🌐 Pontos de Acesso
+
+| Ambiente          | Frontend (Navegador)           | Backend (API)                    |
+| :---------------- | :----------------------------- | :------------------------------- |
+| **Desenvolvimento** | `http://localhost:5173`        | `http://localhost:3000/api`      |
+| **Produção** | `http://localhost:8080` (ou a porta que você definiu) | `http://localhost:8080/api`      |
+
+-----
+
+### 🚨 Solução de Problemas
+
+Para erros comuns como portas em uso, falhas de build ou problemas de permissão, consulte nosso guia detalhado:
+**[➡️ `docs/TROUBLESHOOTING.md`](https://www.google.com/search?q=./docs/TROUBLESHOOTING.md)**
+
+-----
+
+### 👨‍💻 Equipe
+
+| Nome                                  | Matrícula | E-mail                  |
+| :------------------------------------ | :-------- | :---------------------- |
+| Francisco Cassiano de Vasconcelos Souza | 413067    | casinho.555@gmail.com   |
+| Salmo da Cruz Mascarenhas             | 431447    | salmo.cruz@gmail.com    |
+| Akyla de Aquino Pinto                 | 412723    | akylaaquino@hotmail.com |

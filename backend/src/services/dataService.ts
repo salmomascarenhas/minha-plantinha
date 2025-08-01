@@ -2,7 +2,7 @@ import { PrismaClient, SensorData } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-type SensorDataInput = Omit<SensorData, 'id' | 'createdAt' | 'plantId'>;
+type SensorDataInput = Partial<Omit<SensorData, 'id' | 'createdAt' | 'plantId'>>;
 
 export const saveSensorData = async (
   plantId: string,

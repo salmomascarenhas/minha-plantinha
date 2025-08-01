@@ -1,0 +1,26 @@
+# ==============================================
+# DOCKER COMPOSE - DEVELOPMENT OVERRIDE
+# ==============================================
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      target: development
+    ports:
+      - "${BACKEND_PORT:-3000}:${BACKEND_PORT:-3000}"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      target: development
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules

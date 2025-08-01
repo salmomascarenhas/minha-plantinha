@@ -33,7 +33,7 @@ export const loginUser = async (
   payload: LoginPayload,
 ): Promise<{ user: UserData; token: string }> => {
   const user = await prisma.user.findUnique({ where: { email: payload.email } });
-  if (!user) throw new NotFoundError('Usuário não encontrado.');
+  if (!user) throw new NotFoundError('Credenciais inválidas.');
 
   const isPasswordValid = await bcrypt.compare(payload.password, user.password);
   if (!isPasswordValid) throw new UnauthorizedError('Credenciais inválidas.');

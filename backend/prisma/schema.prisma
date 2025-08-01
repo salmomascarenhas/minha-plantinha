@@ -48,14 +48,22 @@ model Plant {
 }
 
 model SensorData {
-  id          String   @id @default(uuid())
-  temperature Float
-  humidity    Float
-  luminosity  Float
-  createdAt   DateTime @default(now())
+  id String @id @default(uuid())
 
-  plant   Plant  @relation(fields: [plantId], references: [id])
-  plantId String
+  humidity    Float?
+  temperature Float?
+  luminosity  Float?
+
+  wifiSignal   Int?
+  waterLevel   Float? // Nível do reservatório de água em cm
+  rainDetected Boolean? // true se chuva for detectada
+  pumpStatus   Boolean? // true se a bomba estiver ligada
+  coverStatus  Boolean? // true se a lona estiver aberta
+  soilStatus   Int? // 0: seco, 1: úmido, 2: encharcado
+
+  createdAt DateTime @default(now())
+  plant     Plant    @relation(fields: [plantId], references: [id])
+  plantId   String
 }
 
 model Achievement {

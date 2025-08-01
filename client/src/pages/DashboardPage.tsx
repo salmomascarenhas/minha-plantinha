@@ -1,4 +1,5 @@
 import {
+  Box,
   Center,
   Grid,
   Loader,
@@ -9,11 +10,18 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconDroplet, IconSun, IconTemperature } from "@tabler/icons-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  IconDroplet,
+  IconPlant2,
+  IconSun,
+  IconSunOff,
+  IconTemperature,
+} from "@tabler/icons-react";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { AiAssistant } from "../components/dashboard/AiAssistant";
 import { ApiKeyDisplayModal } from "../components/dashboard/ApiKeyDisplayModal";
+import { DeviceStatus } from "../components/dashboard/DeviceStatus";
 import { GamificationStatus } from "../components/dashboard/GamificationStatus";
 import { HistoryChart } from "../components/dashboard/HistoryChart";
 import { ManualControls } from "../components/dashboard/ManualControls";
@@ -23,8 +31,26 @@ import { PlantRegisterForm } from "../components/dashboard/PlantRegisterForm";
 import { SensorCard } from "../components/dashboard/SensorCard";
 import api from "../services/apiService";
 
+const convertHumidityToPercentage = (rawValue: number) => {
+  const DRY_VALUE = 2300;
+  const WET_VALUE = 1100;
+
+  const percentage = ((DRY_VALUE - rawValue) / (DRY_VALUE - WET_VALUE)) * 100;
+
+  return Math.round(Math.max(0, Math.min(100, percentage)));
+};
+
+const convertWaterLevelToPercentage = (distanceCm: number) => {
+  const MAX_DISTANCE = 21; // Reservatório vazio
+  const MIN_DISTANCE = 0; // Reservatório cheio
+
+  const percentage =
+    ((MAX_DISTANCE - distanceCm) / (MAX_DISTANCE - MIN_DISTANCE)) * 100;
+
+  return Math.round(Math.max(0, Math.min(100, percentage)));
+};
+
 export function DashboardPage() {
-  const queryClient = useQueryClient();
   const [
     registerModalOpened,
     { open: openRegisterModal, close: closeRegisterModal },
@@ -32,6 +58,12 @@ export function DashboardPage() {
   const [newlyGeneratedApiKey, setNewlyGeneratedApiKey] = useState<
     string | null
   >(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleRegistrationSuccess = (apiKey: string) => {
     closeRegisterModal();
@@ -41,15 +73,6 @@ export function DashboardPage() {
   const handleApiKeyModalClose = () => {
     setNewlyGeneratedApiKey(null);
   };
-
-  // Função para gerenciar o reetch do React Query
-  useEffect(() => {
-    if (registerModalOpened) {
-      queryClient.setQueryDefaults(["myPlantData"], { refetchInterval: false });
-    } else {
-      queryClient.setQueryDefaults(["myPlantData"], { refetchInterval: 10000 });
-    }
-  }, [registerModalOpened, queryClient]);
 
   const {
     data: plantData,
@@ -62,7 +85,8 @@ export function DashboardPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     retry: (failureCount, error: any) =>
       error.response?.status !== 404 && failureCount < 3,
-  }); // Remove o refetchInterval daqui pois agora é gerenciado dinamicamente
+    refetchInterval: registerModalOpened ? false : 10000,
+  });
 
   const { data: gamificationData, isLoading: isLoadingGamification } = useQuery(
     {
@@ -72,7 +96,6 @@ export function DashboardPage() {
     }
   );
 
-  // Enquanto a query principal carrega, mostre o loader principal
   if (isLoadingPlant) {
     return (
       <Center h="80vh">
@@ -91,10 +114,42 @@ export function DashboardPage() {
     );
   }
 
-  // O componente agora retorna uma estrutura principal única
+  const level = gamificationData?.points
+    ? Math.floor(gamificationData.points / 100) + 1
+    : 1;
+  const currentLevelXp = gamificationData?.points
+    ? gamificationData.points % 100
+    : 0;
+
   return (
     <>
-      {/* 1. MOVA OS MODAIS PARA CÁ: Eles agora existem fora de qualquer condição */}
+      <style>
+        {`
+          @keyframes dashboardEntry {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          
+          @keyframes dashboardFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+          }
+          
+          .dashboard-container {
+            animation: ${isLoaded ? "dashboardEntry 0.8s ease-out" : "none"};
+            transition: all 0.3s ease;
+          }
+          
+          .gamified-section {
+            transition: all 0.3s ease;
+          }
+          
+          .gamified-section:hover {
+            animation: dashboardFloat 3s ease-in-out infinite;
+          }
+        `}
+      </style>
+
       <Modal
         opened={registerModalOpened}
         onClose={closeRegisterModal}
@@ -109,77 +164,176 @@ export function DashboardPage() {
         onClose={handleApiKeyModalClose}
       />
 
-      {/* 2. A lógica condicional decide o que mostrar no corpo da página */}
       {plantData ? (
-        // Se HÁ planta, mostre o dashboard completo
-        (() => {
-          const { plant } = plantData;
-          const latestReading = plant.SensorData?.[0];
+        <Box className="dashboard-container">
+          {(() => {
+            const { plant } = plantData;
+            const latestReading = plant.SensorData?.[0];
+            return (
+              <Stack gap="xl">
+                <Title order={1}>Painel de Controle: {plant.name}</Title>
+                {/* Gamification Status */}
+                <Box className="gamified-section">
+                  {isLoadingGamification ? (
+                    <Paper p="lg" radius="md" withBorder>
+                      <Loader size="sm" />
+                    </Paper>
+                  ) : (
+                    gamificationData && (
+                      <GamificationStatus {...gamificationData} />
+                    )
+                  )}
+                </Box>{" "}
+                {/* Layout Responsivo Melhorado */}
+                <Box className="gamified-section">
+                  <Grid>
+                    {/* Coluna Principal - Sensores e Status (Prioridade Mobile) */}
+                    <Grid.Col
+                      span={{ base: 12, md: 8 }}
+                      order={{ base: 1, md: 2 }}
+                    >
+                      <Stack>
+                        {/* Sensores Principais - Medições */}
+                        <Box className="gamified-section">
+                          <Grid>
+                            {/* Primeira linha - Sensores ambientais */}
+                            {typeof latestReading?.humidity === "number" && (
+                              <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
+                                <SensorCard
+                                  title="Umidade Solo"
+                                  value={convertHumidityToPercentage(
+                                    latestReading.humidity
+                                  )}
+                                  unit="%"
+                                  icon={<IconDroplet />}
+                                  color="blue"
+                                />
+                              </Grid.Col>
+                            )}
+                            {typeof latestReading?.temperature === "number" && (
+                              <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
+                                <SensorCard
+                                  title="Temperatura"
+                                  value={latestReading.temperature}
+                                  unit="°C"
+                                  icon={<IconTemperature />}
+                                  color="orange"
+                                />
+                              </Grid.Col>
+                            )}
+                            {typeof latestReading?.luminosity === "number" && (
+                              <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
+                                <SensorCard
+                                  title="Luminosidade"
+                                  value={latestReading.luminosity}
+                                  unit="lux"
+                                  icon={<IconSun />}
+                                  color="yellow"
+                                />
+                              </Grid.Col>
+                            )}
 
-          return (
-            <Stack gap="xl">
-              <Title order={1}>
-                Painel de Controle: {plantData.plant.name}
-              </Title>
+                            {/* Segunda linha - Medições do sistema */}
+                            {typeof latestReading?.waterLevel === "number" && (
+                              <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
+                                <SensorCard
+                                  title="Nível do Reservatório"
+                                  value={convertWaterLevelToPercentage(
+                                    latestReading.waterLevel
+                                  )}
+                                  unit="%"
+                                  icon={<IconDroplet />}
+                                  color={
+                                    convertWaterLevelToPercentage(
+                                      latestReading.waterLevel
+                                    ) < 15
+                                      ? "red"
+                                      : convertWaterLevelToPercentage(
+                                          latestReading.waterLevel
+                                        ) < 40
+                                      ? "yellow"
+                                      : "myGreen"
+                                  }
+                                />
+                              </Grid.Col>
+                            )}
 
-              {isLoadingGamification ? (
-                <Paper p="lg" radius="md" withBorder>
-                  <Loader size="sm" />
-                </Paper>
-              ) : (
-                gamificationData && <GamificationStatus {...gamificationData} />
-              )}
+                            {typeof latestReading?.soilStatus === "number" && (
+                              <Grid.Col span={{ base: 6, sm: 4, lg: 3 }}>
+                                <SensorCard
+                                  title="Condição do Solo"
+                                  value={latestReading.soilStatus}
+                                  unit={
+                                    latestReading.soilStatus === 0
+                                      ? "Seco"
+                                      : latestReading.soilStatus === 1
+                                      ? "Úmido"
+                                      : "Encharcado"
+                                  }
+                                  color={
+                                    latestReading.soilStatus === 0
+                                      ? "yellow"
+                                      : latestReading.soilStatus === 1
+                                      ? "myGreen"
+                                      : "blue"
+                                  }
+                                  icon={
+                                    latestReading.soilStatus === 0 ? (
+                                      <IconSunOff size={24} />
+                                    ) : latestReading.soilStatus === 1 ? (
+                                      <IconPlant2 size={24} />
+                                    ) : (
+                                      <IconDroplet size={24} />
+                                    )
+                                  }
+                                />
+                              </Grid.Col>
+                            )}
+                          </Grid>
+                        </Box>
 
-              <Grid>
-                <Grid.Col span={{ base: 12, md: 8 }}>
-                  <Stack>
-                    <MascotDisplay humidity={latestReading?.humidity} />
-                    <AiAssistant plantId={plant.id} />
-                    <HistoryChart plantId={plant.id} />
-                  </Stack>
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, md: 4 }}>
-                  <Stack>
-                    {latestReading ? (
-                      <>
-                        <SensorCard
-                          title="Umidade"
-                          value={latestReading.humidity}
-                          unit="%"
-                          icon={<IconDroplet />}
-                          color="blue"
+                        <Box className="gamified-section">
+                          <DeviceStatus
+                            wifiSignal={latestReading?.wifiSignal}
+                            rainDetected={latestReading?.rainDetected}
+                            pumpStatus={latestReading?.pumpStatus}
+                            coverStatus={latestReading?.coverStatus}
+                          />
+                        </Box>
+
+                        <Box className="gamified-section">
+                          <HistoryChart plantId={plant.id} />
+                        </Box>
+                      </Stack>
+                    </Grid.Col>
+
+                    {/* Coluna Secundária - Mascote e IA (Mobile fica abaixo) */}
+                    <Grid.Col
+                      span={{ base: 12, md: 4 }}
+                      order={{ base: 2, md: 1 }}
+                    >
+                      <Stack>
+                        <MascotDisplay
+                          soilStatus={latestReading?.soilStatus}
+                          plantName={plant.name}
+                          level={level}
+                          xp={currentLevelXp}
+                          maxXp={100}
                         />
-                        <SensorCard
-                          title="Temperatura"
-                          value={latestReading.temperature}
-                          unit="°C"
-                          icon={<IconTemperature />}
-                          color="orange"
+                        <ManualControls plantId={plant.id} />
+                        <AiAssistant
+                          plantId={plant.id}
+                          plantName={plant.name}
                         />
-                        <SensorCard
-                          title="Luminosidade"
-                          value={latestReading.luminosity}
-                          unit="lux"
-                          icon={<IconSun />}
-                          color="yellow"
-                        />
-                      </>
-                    ) : (
-                      <Paper p="md">
-                        <Text>
-                          Aguardando primeira leitura do dispositivo...
-                        </Text>
-                      </Paper>
-                    )}
-                    <ManualControls plantId={plant.id} />
-                  </Stack>
-                </Grid.Col>
-              </Grid>
-            </Stack>
-          );
-        })()
+                      </Stack>
+                    </Grid.Col>
+                  </Grid>
+                </Box>
+              </Stack>
+            );
+          })()}
+        </Box>
       ) : (
-        // Se NÃO HÁ planta, mostre a NoPlantView
         <NoPlantView onRegisterClick={openRegisterModal} />
       )}
     </>

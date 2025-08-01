@@ -58,9 +58,17 @@ export const plantSchema = z.object({
 
 export const sensorDataSchema = z.object({
   body: z.object({
-    temperature: z.number({ required_error: 'A temperatura é obrigatória.' }),
-    humidity: z.number({ required_error: 'A umidade é obrigatória.' }),
-    luminosity: z.number({ required_error: 'A luminosidade é obrigatória.' }),
+    umidade: z.number({ invalid_type_error: 'Umidade deve ser um número.' }).optional(),
+
+    chuva: z.number().min(0).max(1).optional(),
+    status_bomba: z.number().min(0).max(1).optional(),
+    status_lona: z.number().min(0).max(1).optional(),
+    status_solo: z.number().min(0).max(2).optional(),
+    status_wifi: z.number().optional(),
+    nivel_agua: z.number().optional(),
+
+    temperature: z.number().optional(),
+    luminosity: z.number().optional(),
   }),
 });
 

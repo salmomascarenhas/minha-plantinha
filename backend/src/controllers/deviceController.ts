@@ -6,7 +6,32 @@ import * as deviceService from '../services/deviceService';
 
 export const submitSensorData = asyncHandler(async (req: Request, res: Response) => {
   if (!req.plant) throw new NotFoundError('Dispositivo não identificado pela autenticação.');
-  const newReading = await dataService.saveSensorData(req.plant.id, req.body);
+
+  const {
+    umidade,
+    chuva,
+    status_bomba,
+    status_lona,
+    status_solo,
+    status_wifi,
+    nivel_agua,
+    temperature,
+    luminosity,
+  } = req.body;
+  const dataForDb = {
+    humidity: umidade,
+    wifiSignal: status_wifi,
+    waterLevel: nivel_agua,
+    soilStatus: status_solo,
+    temperature: temperature,
+    luminosity: luminosity,
+    rainDetected: typeof chuva !== 'undefined' ? chuva === 0 : undefined,
+    pumpStatus: typeof status_bomba !== 'undefined' ? status_bomba === 1 : undefined,
+    coverStatus: typeof status_lona !== 'undefined' ? status_lona === 0 : undefined,
+  };
+
+  const newReading = await dataService.saveSensorData(req.plant.id, dataForDb);
+
   res.status(201).json({ message: 'Dados recebidos com sucesso.', data: newReading });
 });
 

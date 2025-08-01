@@ -2,6 +2,7 @@
 import {
   Alert,
   Anchor,
+  Box,
   Button,
   Divider,
   Group,
@@ -72,7 +73,7 @@ export function RegisterPage() {
   return (
     <AuthLayout>
       <Stack gap="lg">
-        <div>
+        <Box>
           <Title order={2} ta="center" mt="md">
             Crie sua Conta
           </Title>
@@ -82,7 +83,7 @@ export function RegisterPage() {
               Faça o login
             </Anchor>
           </Text>
-        </div>
+        </Box>
 
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">
           <Stack>
